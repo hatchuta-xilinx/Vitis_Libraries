@@ -37,7 +37,7 @@
 
 // Maximum host buffer used to operate
 // per kernel invocation
-#define HOST_BUFFER_SIZE (2*1024*1024)
+#define HOST_BUFFER_SIZE (100*1024*1024)
 
 // Default block size
 #define BLOCK_SIZE_IN_KB 64 
@@ -45,7 +45,7 @@
 // Value below is used to associate with
 // Overlapped buffers, ideally overlapped 
 // execution requires 2 resources per invocation
-#define OVERLAP_BUF_COUNT 2 
+#define OVERLAP_BUF_COUNT 1 
 
 // Maximum number of blocks based on host buffer size
 #define MAX_NUMBER_BLOCKS (HOST_BUFFER_SIZE / (BLOCK_SIZE_IN_KB * 1024))
@@ -92,9 +92,8 @@ class xil_lz4 {
     public:
         int init(const std::string& binaryFile, uint8_t);
         int release();
-        uint32_t compress_sequential(uint8_t *in, uint8_t *out, uint32_t actual_size);
-        uint32_t compress(uint8_t *in, uint8_t *out, uint32_t actual_size, uint32_t host_buffer_size, int enable_p2p);
-        uint32_t compress_file(std::string & inFile_name, std::string & outFile_name, int enable_p2p); 
+        uint32_t compress(uint8_t *in, uint8_t *out, uint32_t actual_size);
+        uint32_t compress_file(std::string & inFile_name, std::string & outFile_name); 
         uint32_t decompress_file(std::string & inFile_name, std::string & outFile_name);
         uint64_t get_event_duration_ns(const cl::Event &event);
         void buffer_extension_assignments(bool flow);
@@ -113,44 +112,44 @@ class xil_lz4 {
         cl::Program *m_program;
         cl::Context *m_context;
         cl::CommandQueue *m_q;
-        cl::Kernel* compress_kernel_lz4[C_COMPUTE_UNIT];
-        cl::Kernel* packer_kernel_lz4[C_COMPUTE_UNIT];
+        cl::Kernel* compress_kernel_lz4;
+        cl::Kernel* packer_kernel_lz4;
 
         // Compression related
-        std::vector<uint8_t, aligned_allocator<uint8_t>>  h_buf_in[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];
-        std::vector<uint8_t, aligned_allocator<uint8_t>>  h_buf_out[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];
+        std::vector<uint8_t, aligned_allocator<uint8_t>>  h_buf_in;
+        std::vector<uint8_t, aligned_allocator<uint8_t>>  h_buf_out;
         // LZ4 stream output
-        std::vector<uint8_t, aligned_allocator<uint8_t>>  h_enc_out[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];
-        std::vector<uint32_t, aligned_allocator<uint8_t>> h_blksize[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];
-        std::vector<uint32_t, aligned_allocator<uint8_t>> h_compressSize[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];
+        std::vector<uint8_t, aligned_allocator<uint8_t>>  h_enc_out;
+        std::vector<uint32_t, aligned_allocator<uint8_t>> h_blksize;
+        std::vector<uint32_t, aligned_allocator<uint8_t>> h_compressSize;
         // LZ4 compress stream size out
-        std::vector<uint32_t, aligned_allocator<uint8_t>> h_lz4OutSize[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];
+        std::vector<uint32_t, aligned_allocator<uint8_t>> h_lz4OutSize;
 
         // Header bufffer
         std::vector<uint8_t, aligned_allocator<uint8_t>>  h_header;
 
         
         // Device buffers
-        cl::Buffer* buffer_input[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];
-        cl::Buffer* buffer_output[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];
-        cl::Buffer* buffer_lz4out[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];
-        cl::Buffer* buffer_compressed_size[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];
-        cl::Buffer* buffer_block_size[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];
-        cl::Buffer* buffer_lz4OutSize[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];
-        cl::Buffer* buffer_header[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];
+        cl::Buffer* buffer_input;
+        cl::Buffer* buffer_output;
+        cl::Buffer* buffer_lz4out;
+        cl::Buffer* buffer_compressed_size;
+        cl::Buffer* buffer_block_size;
+        cl::Buffer* buffer_lz4OutSize;
+        cl::Buffer* buffer_header;
         
         // Decompression related
-        std::vector<uint32_t> m_blkSize[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];
-        std::vector<uint32_t> m_compressSize[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];
-        std::vector<bool>     m_is_compressed[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];        
+        std::vector<uint32_t> m_blkSize;
+        std::vector<uint32_t> m_compressSize;
+        std::vector<bool>     m_is_compressed;        
         
         // DDR buffer extensions
-        cl_mem_ext_ptr_t inExt[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];
-        cl_mem_ext_ptr_t outExt[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];
-        cl_mem_ext_ptr_t lz4Ext[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];
-        cl_mem_ext_ptr_t csExt[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];
-        cl_mem_ext_ptr_t bsExt[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];
-        cl_mem_ext_ptr_t lz4SizeExt[MAX_COMPUTE_UNITS][OVERLAP_BUF_COUNT];
+        cl_mem_ext_ptr_t inExt;
+        cl_mem_ext_ptr_t outExt;
+        cl_mem_ext_ptr_t lz4Ext;
+        cl_mem_ext_ptr_t csExt;
+        cl_mem_ext_ptr_t bsExt;
+        cl_mem_ext_ptr_t lz4SizeExt;
         cl_mem_ext_ptr_t headExt;
         
         // Kernel names 

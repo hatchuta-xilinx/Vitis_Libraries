@@ -226,7 +226,7 @@ cleanh:
 cleanall: cleanh cleank
 	rm -rf $(BUILD_DIR)
 	rm -rf $(TEMP_DIR)
-	rm -rf $(XFLIB_DIR)/common/benchmark/cantrbry/*.xe2xd* $(XFLIB_DIR)/common/benchmark/cantrbry/*.xe2sd*
+	rm -rf $(XFLIB_DIR)/L3/demos/lz4_p2p_app/data/*.xe2sd $(XFLIB_DIR)/L3/demos/lz4_p2p_app/data/*.lz4 
 
 clean: cleanh
 
@@ -237,7 +237,7 @@ clean: cleanh
 $(BUILD_DIR)/emconfig.json :
 		emconfigutil --platform $(XPLATFORM) --od $(BUILD_DIR)
 
-HOST_ARGS = -cx $(XCLBIN_FILE_C) -p2p 1 -l test.list
+HOST_ARGS = -cx $(XCLBIN_FILE_C) -l test.list
 $(info HOST_ARGS=$(HOST_ARGS))
 
 ifeq ($(TARGET),sw_emu)
