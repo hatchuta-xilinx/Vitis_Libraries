@@ -157,6 +157,9 @@ void xil_compress_decompress_list(std::string & file_list, std::string & ext1,
             std::string lz_compress_in  = line;
             std::string lz_compress_out = line;
             lz_compress_out =  lz_compress_out + ext1;
+
+            std::string change_perm = "chmod 755 " + lz_compress_out;
+            system(change_perm.c_str());
          
             xlz.m_block_size_in_kb = block_size;
             xlz.m_switch_flow = 0;            

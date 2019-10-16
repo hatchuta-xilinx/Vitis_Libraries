@@ -79,7 +79,7 @@ uint32_t xil_lz4::compress_file(std::string & inFile_name,
 		lseek(fd_p2p_c_in, 0, SEEK_SET);
 
 		//fd_p2p_c_out = open(outFile_name.c_str(),  O_CREAT | O_WRONLY | O_TRUNC | O_APPEND | O_DIRECT, S_IRWXG | S_IRWXU);
-		fd_p2p_c_out = open(outFile_name.c_str(), O_CREAT | O_WRONLY | O_DIRECT);
+		fd_p2p_c_out = open(outFile_name.c_str(),  O_CREAT | O_WRONLY | O_DIRECT, 0777);
 		if(fd_p2p_c_out <= 0) {
 			std::cout << "P2P: Unable to open output file, exited!, ret: "<< fd_p2p_c_out << std::endl;
 			close(fd_p2p_c_in);
@@ -451,20 +451,22 @@ uint32_t xil_lz4::compress(uint8_t *in,
     }
 
     for (uint32_t i = 0; i < 1; i++) {
-        // Fire the kernel
-        m_q->enqueueTask(*compress_kernel_lz4);
-        m_q->finish();
-    
-        // Fire the kernel
-        m_q->enqueueTask(*packer_kernel_lz4);
-        m_q->finish();
+        cl::Event comp_event, pack_event;
+        std::vector<cl::Event> compWait;
+        std::vector<cl::Event> packWait;
 
-        /* Transfer data from device to host.
-        * In p2p case, no need to transfer packer output data from device to host 
-        */
-        m_q->enqueueMigrateMemObjects({*(buffer_lz4OutSize)}, CL_MIGRATE_MEM_OBJECT_HOST);
-        m_q->finish();
+        // Fire compress kernel
+        m_q->enqueueTask(*compress_kernel_lz4, NULL, &comp_event);
+        compWait.push_back(comp_event);
+
+        // Fire packer kernel
+        m_q->enqueueTask(*packer_kernel_lz4, &compWait, &pack_event);
+        packWait.push_back(pack_event);
+
+        // Read back data
+        m_q->enqueueMigrateMemObjects({*(buffer_lz4OutSize)}, CL_MIGRATE_MEM_OBJECT_HOST, &packWait, NULL);
     }
+    m_q->finish();
 
     for (uint32_t i = 0; i < 1; i++) {
         uint32_t compressed_size = h_lz4OutSize.data()[0];
