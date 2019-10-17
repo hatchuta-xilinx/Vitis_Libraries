@@ -34,6 +34,102 @@
 #include <vector>
 #include "cmdlineparser.h"
 
+
+#if 0
+void decompress_multiple_files(
+                                const std::vector<std::string> &inFileVec,
+                                const std::vector<std::string> &outFileVec,
+                                const std::string& compress_bin
+                                ) {
+    std::vector<char *>     outVec;
+    std::vector<uint64_t>   inSizeVec;
+    std::vector<int>        fd_p2p_vec;
+    std::vector<cl_event> userEventVec;
+    uint64_t total_size= 0;
+    uint64_t total_in_size= 0;
+
+    for (uint32_t fid = 0 ; fid < inFileVec.size() ; fid++){
+        uint64_t original_size = 0;
+        std::string inFile_name = inFileVec[fid];
+        std::ifstream inFile(inFile_name.c_str(), std::ifstream::binary);
+        uint64_t input_size = xfLz4::get_file_size(inFile);
+
+#if 0
+        inFile.close();
+
+        int fd_p2p_c_in = open(inFile_name.c_str(), O_RDONLY | O_DIRECT);
+        if (fd_p2p_c_in <= 0) {
+            std::cout << "P2P: Unable to open input file, fd: " << fd_p2p_c_in << std::endl;
+            exit(1);
+        }
+#else
+        if (!inFile) {
+            std::cout << "Unable to open file";
+            exit(1);
+        }
+#endif
+        std::vector<uint8_t, aligned_allocator <uint8_t> > in(input_size);
+        read(fd_p2p_c_in, (char*)in_4kbytes.data(), 4 * KB);
+        lseek(fd_p2p_c_in, 0, SEEK_SET);
+        fd_p2p_vec.push_back(fd_p2p_c_in);
+        std::memcpy(&original_size, &in_4kbytes[6], 4);
+        total_size  += original_size;
+        total_in_size += input_size;
+        orgSizeVec.push_back(original_size);
+        char * out = (char *) aligned_alloc(4096,original_size);
+        outVec.push_back(out);
+        inSizeVec.push_back(input_size);
+    }
+    xfLz4 xlz(decompress_bin);
+    xlz.decompress_in_line_multiple_files(inFileVec, fd_p2p_vec, outVec, orgSizeVec, inSizeVec);
+    for (uint32_t fid = 0 ; fid < inFileVec.size() ; fid++){
+        std::string outFile_name = outFileVec[fid];
+        std::ofstream outFile(outFile_name.c_str(), std::ofstream::binary);
+        outFile.write((char*)outVec[fid], orgSizeVec[fid]);
+        close(fd_p2p_vec[fid]);
+        outFile.close();
+    }
+}
+
+
+void xil_compress_file_list(std::string& file_list, std::string& compress_bin) {
+
+    std::ifstream infilelist_comp(file_list.c_str());
+    std::string line_comp;
+    std::string ext1 = ".xe2sd";
+
+    std::vector<std::string> inFileList;
+    std::vector<std::string> outFileList;
+    std::vector<std::string> origFileList;
+
+     while (std::getline(infilelist_comp, line_dec)) {
+        std::string orig_file  = line_comp + ext1;
+        std::string out_file = line_comp + ext1 + ".lz4";
+        inFileList.push_back(line_comp);
+        origFileList.push_back(orig_file);
+        outFileList.push_back(out_file);
+     }
+    compress_multiple_files(inFileList,outFileList, compress_bin);
+    std::cout << std::endl;
+    for(size_t i = 0 ; i < inFileList.size() ; i ++){
+        std::string dec_command = "../../../common/thirdParty/std_lz4/lz4 --content-size -f -q -d " + outFileList[i];
+        system(dec_command.c_str());
+        int ret = validateFile(inFileList[i], origFileList[i]);
+        if (ret){
+            std::cout << "FAILED: " << inFileList[i] << std::endl;
+        }else{
+            std::cout << "PASSED: " << inFileList[i] << std::endl;
+        }
+    }
+}
+
+int validateFile(std::string& inFile_name, std::string& origFile_name) {
+    std::string command = "cmp " + inFile_name + " " + origFile_name;
+    int ret = system(command.c_str());
+    return ret;
+}
+#else 
+
 void xil_compress_top(std::string & compress_mod, uint32_t block_size, int enable_p2p, uint8_t device_id) {
    
     // Xilinx LZ4 object 
@@ -69,7 +165,7 @@ void xil_compress_top(std::string & compress_mod, uint32_t block_size, int enabl
 
     // Call LZ4 compression
     auto total_start = std::chrono::high_resolution_clock::now();
-    uint32_t enbytes = xlz.compress_file(lz_compress_in, lz_compress_out);
+    uint32_t enbytes = xlz.compress_file(lz_compress_in, lz_compress_out, input_size);
     auto total_end = std::chrono::high_resolution_clock::now();
     auto total_time_ns = std::chrono::duration<double, std::nano>(total_end - total_start);
 
@@ -158,14 +254,11 @@ void xil_compress_decompress_list(std::string & file_list, std::string & ext1,
             std::string lz_compress_out = line;
             lz_compress_out =  lz_compress_out + ext1;
 
-            std::string change_perm = "chmod 755 " + lz_compress_out;
-            system(change_perm.c_str());
-         
             xlz.m_block_size_in_kb = block_size;
             xlz.m_switch_flow = 0;            
  
             // Call LZ4 compression
-            uint32_t enbytes = xlz.compress_file(lz_compress_in, lz_compress_out);
+            uint32_t enbytes = xlz.compress_file(lz_compress_in, lz_compress_out, input_size);
                 std::cout << "\t\t" << (float) input_size  / enbytes << "\t\t" 
                           << (float) input_size/1000000 << "\t\t\t" 
                           << lz_compress_in << std::endl;
@@ -228,6 +321,8 @@ void xil_batch_verify(std::string & file_list, uint32_t block_size, std::string&
         std::string ext3 = ".xe2sd";
         xil_validate(file_list, ext3);
 }
+#endif
+
 
 int main(int argc, char *argv[])
 {

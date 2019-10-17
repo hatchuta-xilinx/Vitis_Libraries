@@ -61,22 +61,20 @@ uint64_t xil_lz4::get_event_duration_ns(const cl::Event &event){
 }
 
 uint32_t xil_lz4::compress_file(std::string & inFile_name, 
-                                std::string & outFile_name
+                                std::string & outFile_name,
+                                uint32_t input_size
                                ) 
 {
-    if (m_switch_flow == 0) { // Xilinx FPGA compression flow
-        std::ifstream inFile;
         std::ofstream outFile;
-        uint32_t input_size;
         uint32_t out_size;
 
-		fd_p2p_c_in = open(inFile_name.c_str(), O_RDONLY | O_DIRECT);
-		if(fd_p2p_c_in <= 0) {
-			std::cout << "P2P: Unable to open input file, fd: " << fd_p2p_c_in << std::endl;
-			exit(1);
-		}
-		input_size = lseek(fd_p2p_c_in, 0, SEEK_END);
-		lseek(fd_p2p_c_in, 0, SEEK_SET);
+        std::ifstream inFile(inFile_name.c_str(), std::ifstream::binary);
+         if (!inFile) {
+            std::cout << "Unable to open file";
+            exit(1);
+        }
+        std::vector<uint8_t, aligned_allocator<uint8_t> > in(input_size);
+        inFile.read((char*)in.data(), input_size);
 
 		//fd_p2p_c_out = open(outFile_name.c_str(),  O_CREAT | O_WRONLY | O_TRUNC | O_APPEND | O_DIRECT, S_IRWXG | S_IRWXU);
 		fd_p2p_c_out = open(outFile_name.c_str(),  O_CREAT | O_WRONLY | O_DIRECT, 0777);
@@ -85,61 +83,15 @@ uint32_t xil_lz4::compress_file(std::string & inFile_name,
 			close(fd_p2p_c_in);
 			exit(1);
 		}
-
-        // Default value set to 64K
-        uint8_t block_size_header = 0;
-        switch(m_block_size_in_kb) {
-
-            case 64:
-                    block_size_header = BSIZE_STD_64KB;
-                    break;
-            case 256:
-                     block_size_header = BSIZE_STD_256KB;
-                     break;
-            case 1024:
-                      block_size_header = BSIZE_STD_1024KB;
-                      break;
-            case 4096:
-                      block_size_header = BSIZE_STD_4096KB;
-                      break;
-            default:
-                    block_size_header = BSIZE_STD_64KB;
-                    std::cout << "Invalid Block Size given, so setting to 64K"<<std::endl;
-                    break;
-        }
-
-        uint8_t temp_buff[10] = {FLG_BYTE,
-                                 block_size_header,
-                                 input_size,
-                                 input_size >> 8,
-                                 input_size >> 16,
-                                 input_size >> 24,
-                                 0,0,0,0
-                                };
-
-        // xxhash is used to calculate hash value
-        uint32_t xxh = XXH32(temp_buff, 10, 0);
-        // This value is sent to Kernel 2
-        xxhash_val = (xxh>>8);
-
+        
         uint32_t enbytes;
-        // LZ4 overlap & multiple compute unit compress 
-		/* Pass NULL values for input and output to the compress() function,
-		 * since these buffers are not needed in P2P.
+		/* Pass NULL value for output to the compress() function,
+		 * since this buffer not needed in P2P.
 		 */
-        enbytes = compress(NULL, NULL, input_size);
-        close(fd_p2p_c_in);
+        enbytes = compress(in.data(), NULL, input_size);
+        inFile.close();
         close(fd_p2p_c_out);
         return enbytes;
-    } else { // Standard LZ4 flow
-        std::string command = "../../../common/thirdParty/std_lz4/lz4 --content-size -f -q " + inFile_name;
-        system(command.c_str());
-        std::string output = inFile_name + ".lz4";
-        std::string rout = inFile_name + ".std.lz4";
-        std::string rename = "mv " + output + " " + rout;
-        system(rename.c_str());
-        return 0;
-    }
 }
 
 int validate(std::string & inFile_name, std::string & outFile_name) {
@@ -276,8 +228,6 @@ uint32_t xil_lz4::compress(uint8_t *in,
                            uint32_t input_size
                          ) {
 
-    /* Input buffer pointer used in p2p case */
-    uint8_t *h_buf_in_p2p;
     /* Packer output buffer pointer used in p2p case */
     uint8_t *h_buf_out_p2p;
     int ret = 0;
@@ -287,6 +237,43 @@ uint32_t xil_lz4::compress(uint8_t *in,
 
     auto total_start = std::chrono::high_resolution_clock::now();
     for (uint32_t i = 0; i < 1; i++) {
+        // Default value set to 64K
+        uint8_t block_size_header = 0;
+        switch(m_block_size_in_kb) {
+
+            case 64:
+                    block_size_header = BSIZE_STD_64KB;
+                    break;
+            case 256:
+                     block_size_header = BSIZE_STD_256KB;
+                     break;
+            case 1024:
+                      block_size_header = BSIZE_STD_1024KB;
+                      break;
+            case 4096:
+                      block_size_header = BSIZE_STD_4096KB;
+                      break;
+            default:
+                    block_size_header = BSIZE_STD_64KB;
+                    std::cout << "Invalid Block Size given, so setting to 64K"<<std::endl;
+                    break;
+        }
+
+        uint8_t temp_buff[10] = {FLG_BYTE,
+                                 block_size_header,
+                                 input_size,
+                                 input_size >> 8,
+                                 input_size >> 16,
+                                 input_size >> 24,
+                                 0,0,0,0
+                                };
+
+        // xxhash is used to calculate hash value
+        uint32_t xxh = XXH32(temp_buff, 10, 0);
+        // This value is sent to Kernel 2
+        xxhash_val = (xxh>>8);
+
+
         uint32_t block_size_in_bytes = m_block_size_in_kb * 1024;
 
         // Header information
@@ -331,23 +318,16 @@ uint32_t xil_lz4::compress(uint8_t *in,
         
         uint32_t num_blocks = (input_size - 1)/block_size_in_bytes + 1;
 
-        // Device buffer allocation
-        /* set cl_mem_ext_ptr flag to XCL_MEM_EXT_P2P_BUFFER for p2p to work */
-        inExt.flags |= XCL_MEM_EXT_P2P_BUFFER;
-        /* obj set to nullptr as we call enqueueMapBuffer explicitly for p2p to work */
-        inExt.obj   = nullptr;
+        std::memcpy(h_buf_in.data(), &in[0], input_size);
 
+        // Device buffer allocation
         lz4Ext.flags |= XCL_MEM_EXT_P2P_BUFFER;
         lz4Ext.obj   = nullptr;
 
         // K1 Input:- This buffer contains input chunk data
-        buffer_input = new cl::Buffer(*m_context, 
-                                                CL_MEM_READ_ONLY | CL_MEM_EXT_PTR_XILINX,
+        buffer_input = new cl::Buffer(*m_context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX,
                                                 input_size,
                                                 &(inExt));
-        h_buf_in_p2p = (uint8_t*)m_q->enqueueMapBuffer(*(buffer_input),
-                        CL_TRUE, CL_MAP_WRITE, 0, input_size);
-
         // K2 Output:- This buffer contains compressed data written by device
         buffer_lz4out = new cl::Buffer(*m_context, 
                                             CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX,
@@ -405,21 +385,17 @@ uint32_t xil_lz4::compress(uint8_t *in,
             }
             h_blksize.data()[bIdx++] = block_size;
         } 
-        
-        // Copy data from input buffer to host
-        auto start = std::chrono::high_resolution_clock::now();
-            /* Third arg in read() should be divisible by 4K */
-                ret = read(fd_p2p_c_in, h_buf_in_p2p, HOST_BUFFER_SIZE);
-        if (ret == -1)
-            std::cout<<"P2P: read() failed with error: "<<ret<<", line: "<<__LINE__<<std::endl;
-        auto end = std::chrono::high_resolution_clock::now();
-        auto p2p_time = std::chrono::duration<double, std::nano>(end - start);
-        total_p2p_read_time += p2p_time.count();
-
+     
         /* Transfer data from host to device
         * In p2p case, no need to transfer buffer input to device from host.
         */
-        m_q->enqueueMigrateMemObjects({*(buffer_block_size)}, 0, NULL);
+        std::vector<cl::Memory> inBufVec;
+
+        inBufVec.push_back(*(buffer_input));
+        inBufVec.push_back(*(buffer_block_size));
+
+        // Migrate memory - Map host to device buffers
+        m_q->enqueueMigrateMemObjects(inBufVec, 0 /* 0 means from host*/);
         m_q->finish();
 
         // Set kernel arguments

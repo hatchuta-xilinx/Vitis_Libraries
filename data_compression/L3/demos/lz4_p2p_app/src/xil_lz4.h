@@ -93,7 +93,7 @@ class xil_lz4 {
         int init(const std::string& binaryFile, uint8_t);
         int release();
         uint32_t compress(uint8_t *in, uint8_t *out, uint32_t actual_size);
-        uint32_t compress_file(std::string & inFile_name, std::string & outFile_name); 
+        uint32_t compress_file(std::string & inFile_name, std::string & outFile_name, uint32_t input_size); 
         uint32_t decompress_file(std::string & inFile_name, std::string & outFile_name);
         uint64_t get_event_duration_ns(const cl::Event &event);
         void buffer_extension_assignments(bool flow);
