@@ -322,6 +322,7 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
         uint32_t no_blocks_calc = (inSizeVec[i] - 1) / (m_block_size_in_kb * 1024) + 1;
 
         // K2 Set Kernel arguments
+        printf("Packer kernel set Args....\n");
         narg = 0;
         packer_kernel_lz4->setArg(narg++, *(bufOutputVec[i]));
         packer_kernel_lz4->setArg(narg++, *(buflz4OutVec[i]));
@@ -337,25 +338,28 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
         packer_kernel_lz4->setArg(narg++, tail_bytes);
     }
 
+    std::vector<cl::Event> compWait[inVec.size()];
+    std::vector<cl::Event> packWait[inVec.size()];
     for (uint32_t i = 0; i < inVec.size(); i++) {
         printf("Iteration:%d\n",i);
         cl::Event comp_event, pack_event;
-        std::vector<cl::Event> compWait;
-        std::vector<cl::Event> packWait;
 
         // Fire compress kernel
         m_q->enqueueTask(*compress_kernel_lz4, NULL, &comp_event);
-        compWait.push_back(comp_event);
+        compWait[i].push_back(comp_event);
 
         // Fire packer kernel
-        m_q->enqueueTask(*packer_kernel_lz4, &compWait, &pack_event);
-        packWait.push_back(pack_event);
+        m_q->enqueueTask(*packer_kernel_lz4, &compWait[i], &pack_event);
+        packWait[i].push_back(pack_event);
 
         // Read back data
-        m_q->enqueueMigrateMemObjects({*(buflz4OutSizeVec[i])}, CL_MIGRATE_MEM_OBJECT_HOST, &packWait, NULL);
+        m_q->enqueueMigrateMemObjects({*(buflz4OutSizeVec[i])}, CL_MIGRATE_MEM_OBJECT_HOST, &packWait[i], NULL);
     }
     m_q->finish();
 
+    for (uint32_t i = 0; i < inVec.size(); i++){
+        printf("CompressSize:%d\n",h_lz4OutSize[i].data()[0]);
+    }
     for (uint32_t i = 0; i < inVec.size(); i++) {
         printf("Iteration:%d\n",i);
         printf("Writing %d th file\n",i);
