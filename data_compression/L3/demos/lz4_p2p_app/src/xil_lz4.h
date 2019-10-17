@@ -81,22 +81,18 @@
 
 int validate(std::string & inFile_name, std::string & outFile_name);
 
-static uint32_t get_file_size(std::ifstream &file){
-    file.seekg(0,file.end);
-    uint32_t file_size = file.tellg();
-    file.seekg(0,file.beg);
-    return file_size;
-}
-
 class xil_lz4 {
     public:
-        int init(const std::string& binaryFile, uint8_t);
-        int release();
-        uint32_t compress(uint8_t *in, uint8_t *out, uint32_t actual_size);
-        uint32_t compress_file(std::string & inFile_name, std::string & outFile_name, uint32_t input_size); 
-        uint32_t decompress_file(std::string & inFile_name, std::string & outFile_name);
+        void compress_in_line_multiple_files(std::vector<char *> &inVec,
+                           std::vector<int> &fd_p2p_vec,
+                           std::vector<uint32_t>   &inSizeVec);
+        static uint32_t get_file_size(std::ifstream &file) {
+            file.seekg(0,file.end);
+            uint32_t file_size = file.tellg();
+            file.seekg(0,file.beg);
+            return file_size;
+        }
         uint64_t get_event_duration_ns(const cl::Event &event);
-        void buffer_extension_assignments(bool flow);
         // Binary flow compress/decompress        
         bool m_bin_flow;        
         
@@ -105,8 +101,8 @@ class xil_lz4 {
 
         // Switch between FPGA/Standard flows
         bool m_switch_flow;
- 
-        xil_lz4();
+
+        xil_lz4(const std::string& binaryFile, uint8_t);
         ~xil_lz4();
     private:
         cl::Program *m_program;
@@ -123,34 +119,15 @@ class xil_lz4 {
         std::vector<uint32_t, aligned_allocator<uint8_t>> h_blksize;
         std::vector<uint32_t, aligned_allocator<uint8_t>> h_compressSize;
         // LZ4 compress stream size out
-        std::vector<uint32_t, aligned_allocator<uint8_t>> h_lz4OutSize;
+        std::vector<uint32_t, aligned_allocator<uint8_t>> h_lz4OutSize[2];
 
         // Header bufffer
         std::vector<uint8_t, aligned_allocator<uint8_t>>  h_header;
 
-        
-        // Device buffers
-        cl::Buffer* buffer_input;
-        cl::Buffer* buffer_output;
-        cl::Buffer* buffer_lz4out;
-        cl::Buffer* buffer_compressed_size;
-        cl::Buffer* buffer_block_size;
-        cl::Buffer* buffer_lz4OutSize;
-        cl::Buffer* buffer_header;
-        
         // Decompression related
         std::vector<uint32_t> m_blkSize;
         std::vector<uint32_t> m_compressSize;
         std::vector<bool>     m_is_compressed;        
-        
-        // DDR buffer extensions
-        cl_mem_ext_ptr_t inExt;
-        cl_mem_ext_ptr_t outExt;
-        cl_mem_ext_ptr_t lz4Ext;
-        cl_mem_ext_ptr_t csExt;
-        cl_mem_ext_ptr_t bsExt;
-        cl_mem_ext_ptr_t lz4SizeExt;
-        cl_mem_ext_ptr_t headExt;
         
         // Kernel names 
         std::vector<std::string> compress_kernel_names = {"xilLz4Compress"
@@ -158,8 +135,4 @@ class xil_lz4 {
 
         std::vector<std::string> packer_kernel_names = {"xil_lz4_packer_cu1"
                                                        };
-
-        // DDR numbers
-        std::vector<uint32_t> comp_ddr_nums = {XCL_MEM_DDR_BANK0
-                                        };
 };
