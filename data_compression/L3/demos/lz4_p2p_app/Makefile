@@ -159,7 +159,7 @@ $(XCLBIN_FILE_C): $(TEMP_DIR)/xf_packer.xo $(TEMP_DIR)/xf_compress.xo
 # ------------------------------------------------------------
 #                       host setup
 
-CXX := $(XILINX_SDX)/bin/xcpp
+CXX := $(XILINX_SDX)/bin/xcpp -g 
 HOST_EXE := xil_lz4_8b
 #EXE_EXT = exe
 

@@ -84,8 +84,8 @@ int validate(std::string & inFile_name, std::string & outFile_name);
 class xil_lz4 {
     public:
         void compress_in_line_multiple_files(std::vector<char *> &inVec,
-                           std::vector<int> &fd_p2p_vec,
-                           std::vector<uint32_t>   &inSizeVec);
+                           const std::vector<std::string> &outFileVec,
+                           std::vector<uint32_t>   &inSizeVec, bool enable_p2p);
         static uint32_t get_file_size(std::ifstream &file) {
             file.seekg(0,file.end);
             uint32_t file_size = file.tellg();
@@ -110,24 +110,6 @@ class xil_lz4 {
         cl::CommandQueue *m_q;
         cl::Kernel* compress_kernel_lz4;
         cl::Kernel* packer_kernel_lz4;
-
-        // Compression related
-        std::vector<uint8_t, aligned_allocator<uint8_t>>  h_buf_in;
-        std::vector<uint8_t, aligned_allocator<uint8_t>>  h_buf_out;
-        // LZ4 stream output
-        std::vector<uint8_t, aligned_allocator<uint8_t>>  h_enc_out;
-        std::vector<uint32_t, aligned_allocator<uint8_t>> h_blksize;
-        std::vector<uint32_t, aligned_allocator<uint8_t>> h_compressSize;
-        // LZ4 compress stream size out
-        std::vector<uint32_t, aligned_allocator<uint8_t>> h_lz4OutSize[2];
-
-        // Header bufffer
-        std::vector<uint8_t, aligned_allocator<uint8_t>>  h_header;
-
-        // Decompression related
-        std::vector<uint32_t> m_blkSize;
-        std::vector<uint32_t> m_compressSize;
-        std::vector<bool>     m_is_compressed;        
         
         // Kernel names 
         std::vector<std::string> compress_kernel_names = {"xilLz4Compress"

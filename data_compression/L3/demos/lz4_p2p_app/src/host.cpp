@@ -39,13 +39,14 @@ void compress_multiple_files(
                                 const std::vector<std::string> &inFileVec,
                                 const std::vector<std::string> &outFileVec,
                                 uint32_t block_size,
-                                const std::string& compress_bin
+                                const std::string& compress_bin,
+                                bool enable_p2p
                                 ) {
     std::vector<char *>     inVec;
+    std::vector<int>        fd_p2p_vec;
     std::vector<char *>     outVec;
     std::vector<uint32_t>   inSizeVec;
-    std::vector<int>        fd_p2p_vec;
-    std::vector<cl_event> userEventVec;
+
     uint64_t total_size= 0;
     uint64_t total_in_size= 0;
 
@@ -68,18 +69,20 @@ void compress_multiple_files(
         inVec.push_back(in);
         inSizeVec.push_back(input_size);
 
-		//fd_p2p_c_out = open(outFile_name.c_str(),  O_CREAT | O_WRONLY | O_TRUNC | O_APPEND | O_DIRECT, S_IRWXG | S_IRWXU);
-		int fd_p2p_c_out = open(outFile_name.c_str(),  O_CREAT | O_WRONLY | O_DIRECT, 0777);
-		if(fd_p2p_c_out <= 0) {
-			std::cout << "P2P: Unable to open output file, exited!, ret: "<< fd_p2p_c_out << std::endl;
-			close(fd_p2p_c_out);
-			exit(1);
-		}
-        fd_p2p_vec.push_back(fd_p2p_c_out);
+        if (enable_p2p) {
+		    //fd_p2p_c_out = open(outFile_name.c_str(),  O_CREAT | O_WRONLY | O_TRUNC | O_APPEND | O_DIRECT, S_IRWXG | S_IRWXU);
+		    int fd_p2p_c_out = open(outFile_name.c_str(),  O_CREAT | O_WRONLY | O_DIRECT, 0777);
+		    if(fd_p2p_c_out <= 0) {
+			    std::cout << "P2P: Unable to open output file, exited!, ret: "<< fd_p2p_c_out << std::endl;
+			    close(fd_p2p_c_out);
+			    exit(1);
+		    }
+            fd_p2p_vec.push_back(fd_p2p_c_out);
+        }
     }    
     xil_lz4 xlz(compress_bin, 0);
     xlz.m_block_size_in_kb = block_size;
-    xlz.compress_in_line_multiple_files(inVec, fd_p2p_vec, inSizeVec);
+    xlz.compress_in_line_multiple_files(inVec, outFileVec, inSizeVec, enable_p2p);
 }
 
 int validateFile(std::string& inFile_name, std::string& origFile_name) {
@@ -88,7 +91,7 @@ int validateFile(std::string& inFile_name, std::string& origFile_name) {
     return ret;
 }
 
-void xil_compress_file_list(std::string& file_list, uint32_t block_size, std::string& compress_bin) {
+void xil_compress_file_list(std::string& file_list, uint32_t block_size, std::string& compress_bin, bool enable_p2p) {
 
     std::ifstream infilelist_comp(file_list.c_str());
     std::string line_comp;
@@ -105,7 +108,7 @@ void xil_compress_file_list(std::string& file_list, uint32_t block_size, std::st
         origFileList.push_back(orig_file);
         outFileList.push_back(out_file);
      }
-    compress_multiple_files(inFileList,outFileList, block_size, compress_bin);
+    compress_multiple_files(inFileList,outFileList, block_size, compress_bin, enable_p2p);
     std::cout << std::endl;
     for(size_t i = 0 ; i < inFileList.size() ; i ++){
         std::string dec_command = "../../../common/thirdParty/std_lz4/lz4 --content-size -f -q -d " + outFileList[i];
@@ -123,14 +126,14 @@ int main(int argc, char *argv[])
 {
     sda::utils::CmdLineParser parser;
     parser.addSwitch("--compress_xclbin",    "-cx",      "Compress XCLBIN",        "compress");
-    parser.addSwitch("--compress",    "-c",      "Compress",        "");
+    parser.addSwitch("--p2p_flow",    "-p2p",      "P2P Flow",        "0");
     parser.addSwitch("--file_list",   "-l",      "List of Input Files",    "");
     parser.addSwitch("--block_size",  "-B",      "Compress Block Size [0-64: 1-256: 2-1024: 3-4096]",    "0");
     parser.addSwitch("--id",  "-id",      "Device ID",    "0");
     parser.parse(argc, argv);
     
     std::string compress_bin      = parser.value("compress_xclbin");   
-    std::string compress_mod      = parser.value("compress");   
+    std::string p2p               = parser.value("p2p_flow");   
     std::string filelist          = parser.value("file_list");   
     std::string block_size        = parser.value("block_size");    
     std::string device_ids        = parser.value("id");
@@ -140,6 +143,11 @@ int main(int argc, char *argv[])
 	device_id = atoi(device_ids.c_str());
     }
     uint32_t bSize = 0;
+
+    bool enable_p2p = 0;
+    if (!(p2p.empty()))
+        enable_p2p = atoi(p2p.c_str());
+
     // Block Size
     if (!(block_size.empty())) { 
         bSize = atoi(block_size.c_str());
@@ -159,11 +167,6 @@ int main(int argc, char *argv[])
         // Default Block Size - 64KB
         bSize = BLOCK_SIZE_IN_KB;
     }
-#if 0
-    // "-c" - Compress Mode
-    if (!compress_mod.empty())
-    	xil_compress_top(compress_mod, bSize, 1, device_id);
-#endif
 
     // "-l" List of Files 
     if (!filelist.empty()) {
@@ -173,10 +176,7 @@ int main(int argc, char *argv[])
         std::cout << "Please build LZ4 executable ";
         std::cout << "from following source ";
         std::cout << "https://github.com/lz4/lz4.git" << std::endl;
-#if 0
-        xil_batch_verify(filelist, bSize,compress_bin);
-#else
-        xil_compress_file_list(filelist, bSize, compress_bin);
-#endif
+
+        xil_compress_file_list(filelist, bSize, compress_bin, enable_p2p);
     }
 }
