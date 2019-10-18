@@ -37,6 +37,6 @@ This LZ4 P2P Compress application runs with Xilinx compression and standard deco
 ```
   - Run the design
 ```
-        $ ./build/xil_lz4_8b -cx ./build/compress.xclbin -p2p 1 -l <./data/test.list>
+        $ ./build/xil_lz4_8b -cx ./build/compress.xclbin -l <./data/test.list>
 ```
 
