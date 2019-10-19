@@ -1,4 +1,4 @@
-This LZ4 P2P Compress application runs with Xilinx compression and standard decompression flow.
+This LZ4 P2P Compress application runs with Xilinx compression and standard decompression flow and currently supported with non P2P flow.
 
 * Source codes (data_compression): In this folder all the source files are available.
 ```
@@ -37,6 +37,7 @@ This LZ4 P2P Compress application runs with Xilinx compression and standard deco
 ```
   - Run the design
 ```
-        $ ./build/xil_lz4_8b -cx ./build/compress.xclbin -l <./data/test.list>
+        To enable P2P flow give 1 else 0
+        $ ./build/xil_lz4_8b -cx ./build/compress.xclbin -p2p <0/1> -l <./data/test.list> 
 ```
 

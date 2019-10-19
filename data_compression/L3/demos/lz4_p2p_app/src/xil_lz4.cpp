@@ -214,9 +214,9 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
 
     //Pre Processing
     for (uint32_t i = 0; i < inVec.size(); i++) {
-        uint8_t* h_header = (uint8_t*) aligned_alloc(4096,200);
-        uint32_t* h_blksize = (uint32_t*) aligned_alloc(4096,200);
-        uint32_t* h_lz4outSize = (uint32_t*) aligned_alloc(4096,200);
+        uint8_t* h_header = (uint8_t*) aligned_alloc(4096, 4096);
+        uint32_t* h_blksize = (uint32_t*) aligned_alloc(4096,4096);
+        uint32_t* h_lz4outSize = (uint32_t*) aligned_alloc(4096,4096);
         uint32_t block_size_in_bytes = m_block_size_in_kb * 1024;
         uint32_t head_size = create_header(h_header, inSizeVec[i]);
         headerSizeVec.push_back(head_size);
@@ -241,7 +241,10 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
 
         // DDR buffer extensions
         cl_mem_ext_ptr_t lz4Ext;
-        lz4Ext.flags = XCL_MEM_DDR_BANK0 | XCL_MEM_EXT_P2P_BUFFER;
+        if (enable_p2p) 
+            lz4Ext.flags = XCL_MEM_DDR_BANK0 | XCL_MEM_EXT_P2P_BUFFER;
+        else
+            lz4Ext.flags = XCL_MEM_DDR_BANK0;
         lz4Ext.param   = NULL;
         lz4Ext.obj   = nullptr;
 
