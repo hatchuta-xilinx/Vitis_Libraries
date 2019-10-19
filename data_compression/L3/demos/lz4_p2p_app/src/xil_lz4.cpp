@@ -130,6 +130,7 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
     std::vector<cl::Buffer*> bufCompSizeVec;
     std::vector<cl::Buffer*> bufheadVec;
     std::vector<uint8_t*> bufp2pOutVec;
+    std::vector<int>        fd_p2p_vec;
 
     std::vector<uint8_t*> h_headerVec;
     std::vector<uint32_t*> h_blkSizeVec;
@@ -140,7 +141,7 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
     uint64_t total_kernel_time = 0;
     uint64_t total_packer_kernel_time = 0;
 
-    auto total_start = std::chrono::high_resolution_clock::now();
+    //Pre Processing
     for (uint32_t i = 0; i < inVec.size(); i++) {
         // Default value set to 64K
         uint8_t block_size_header = 0;
@@ -300,19 +301,18 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
                 block_size = inSizeVec[i] - j;
             }
             h_blksize[bIdx++] = block_size;
-        } 
-     
-        /* Transfer data from host to device
-        * In p2p case, no need to transfer buffer input to device from host.
-        */
-        std::vector<cl::Memory> inBufVec;
+        }
 
-        inBufVec.push_back(*(bufInputVec[i]));
-        inBufVec.push_back(*(bufblockSizeVec[i]));
+        if (enable_p2p) {
+		    int fd_p2p_c_out = open(outFileVec[i].c_str(),  O_CREAT | O_WRONLY | O_DIRECT, 0777);
+		    if(fd_p2p_c_out <= 0) {
+			    std::cout << "P2P: Unable to open output file, exited!, ret: "<< fd_p2p_c_out << std::endl;
+			    close(fd_p2p_c_out);
+			    exit(1);
+		    }
+            fd_p2p_vec.push_back(fd_p2p_c_out);
+        }
 
-        // Migrate memory - Map host to device buffers
-        m_q->enqueueMigrateMemObjects(inBufVec, 0 /* 0 means from host*/);
-        m_q->finish();
 
         // Set kernel arguments
         int narg = 0;
@@ -345,8 +345,19 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
     std::vector<cl::Event> compWait[inVec.size()];
     std::vector<cl::Event> packWait[inVec.size()];
 
-    auto kernel_start = std::chrono::high_resolution_clock::now();   
+    auto total_start = std::chrono::high_resolution_clock::now();
     for (uint32_t i = 0; i < inVec.size(); i++) {
+        /* Transfer data from host to device
+        * In p2p case, no need to transfer buffer input to device from host.
+        */
+        std::vector<cl::Memory> inBufVec;
+
+        inBufVec.push_back(*(bufInputVec[i]));
+        inBufVec.push_back(*(bufblockSizeVec[i]));
+
+        // Migrate memory - Map host to device buffers
+        m_q->enqueueMigrateMemObjects(inBufVec, 0 /* 0 means from host*/);
+        m_q->finish();
         cl::Event comp_event, pack_event;
 
         // Fire compress kernel
@@ -361,7 +372,7 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
         m_q->enqueueMigrateMemObjects({*(buflz4OutSizeVec[i])}, CL_MIGRATE_MEM_OBJECT_HOST, &packWait[i], NULL);
     }
     m_q->finish();
-    auto kernel_end = std::chrono::high_resolution_clock::now();   
+    auto total_end = std::chrono::high_resolution_clock::now();   
 
     for (uint32_t i = 0; i < inVec.size(); i++) {
         uint32_t compressed_size = *(h_lz4OutSizeVec[i]);
@@ -383,10 +394,10 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
 
         if (enable_p2p) {
             //uncomment after enabling for p2p
-            //ret = write(fd_p2p_vec[i],  bufp2pOutVec[i], compressed_size);
+            ret = write(fd_p2p_vec[i],  bufp2pOutVec[i], compressed_size);
             if (ret == -1)
                 std::cout<<"P2P: write() failed with error: "<<ret<<", line: "<<__LINE__<<std::endl;
-            //close(fd_p2p_vec[i]);
+            close(fd_p2p_vec[i]);
         }else {
             std::ofstream outFile(outFileVec[i].c_str(), std::ofstream::binary);
             // Testing purpose on non-p2p platform
@@ -399,10 +410,10 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
         }
 
         outIdx += compressed_size;
-        auto kernel_time_ns = std::chrono::duration<double, std::nano>(kernel_end - kernel_start);
-        float kernel_throughput_in_mbps_1 = (float)inSizeVec[i] * 1000 / kernel_time_ns.count();
+        auto time_ns = std::chrono::duration<double, std::nano>(total_end - total_start);
+        float throughput_in_mbps_1 = (float)inSizeVec[i] * 1000 / time_ns.count();
 
-        std::cout << "\nKernel Throughput (MBps):" << std::fixed << std::setprecision(2) << kernel_throughput_in_mbps_1;
+        std::cout << "\nThroughput (MBps):" << std::fixed << std::setprecision(2) << throughput_in_mbps_1;
     }
    
     for (uint32_t i = 0; i < inVec.size(); i++) { 
