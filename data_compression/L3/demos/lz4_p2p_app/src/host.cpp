@@ -69,16 +69,6 @@ void compress_multiple_files(
         inVec.push_back(in);
         inSizeVec.push_back(input_size);
 
-        if (enable_p2p) {
-		    //fd_p2p_c_out = open(outFile_name.c_str(),  O_CREAT | O_WRONLY | O_TRUNC | O_APPEND | O_DIRECT, S_IRWXG | S_IRWXU);
-		    int fd_p2p_c_out = open(outFile_name.c_str(),  O_CREAT | O_WRONLY | O_DIRECT, 0777);
-		    if(fd_p2p_c_out <= 0) {
-			    std::cout << "P2P: Unable to open output file, exited!, ret: "<< fd_p2p_c_out << std::endl;
-			    close(fd_p2p_c_out);
-			    exit(1);
-		    }
-            fd_p2p_vec.push_back(fd_p2p_c_out);
-        }
     }    
     xil_lz4 xlz(compress_bin, 0);
     xlz.m_block_size_in_kb = block_size;
