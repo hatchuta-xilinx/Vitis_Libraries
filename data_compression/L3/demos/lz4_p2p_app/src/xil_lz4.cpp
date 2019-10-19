@@ -96,7 +96,80 @@ xil_lz4::xil_lz4(const std::string& binaryFileName, uint8_t device_id){
     // Create Compress kernels
     compress_kernel_lz4 = new cl::Kernel(*m_program, compress_kernel_names[0].c_str());
     packer_kernel_lz4 = new cl::Kernel(*m_program, packer_kernel_names[0].c_str());
-}   
+} 
+
+size_t xil_lz4::create_header(uint8_t* h_header, uint32_t inSize)
+{
+    uint8_t block_size_header = 0;
+    switch(m_block_size_in_kb) {
+    
+        case 64:
+                block_size_header = BSIZE_STD_64KB;
+                break;
+        case 256:
+                 block_size_header = BSIZE_STD_256KB;
+                 break;
+        case 1024:
+                  block_size_header = BSIZE_STD_1024KB;
+                  break;
+        case 4096:
+                  block_size_header = BSIZE_STD_4096KB;
+                  break;
+        default:
+                block_size_header = BSIZE_STD_64KB;
+                std::cout << "Valid block size not given, setting to 64K"<<std::endl;
+                break;
+    }
+    
+    uint8_t temp_buff[10] = {FLG_BYTE,
+                             block_size_header,
+                             inSize,
+                             inSize >> 8,
+                             inSize >> 16,
+                             inSize >> 24,
+                             0,0,0,0
+                            };
+    
+    // xxhash is used to calculate hash value
+    uint32_t xxh = XXH32(temp_buff, 10, 0);
+    // This value is sent to Kernel 2
+    uint32_t xxhash_val = (xxh>>8);
+    
+    
+    uint32_t block_size_in_bytes = m_block_size_in_kb * 1024;
+    
+    // Header information
+    uint32_t head_size = 0;
+    
+    h_header[head_size++] = MAGIC_BYTE_1;
+    h_header[head_size++] = MAGIC_BYTE_2;
+    h_header[head_size++] = MAGIC_BYTE_3;
+    h_header[head_size++] = MAGIC_BYTE_4;
+    
+    h_header[head_size++] = FLG_BYTE;
+    
+    // Value
+    switch(m_block_size_in_kb) {
+        case 64:h_header[head_size++]   = BSIZE_STD_64KB;  break;
+        case 256:h_header[head_size++]  = BSIZE_STD_256KB; break;
+        case 1024:h_header[head_size++] = BSIZE_STD_1024KB;break;
+        case 4096:h_header[head_size++] = BSIZE_STD_4096KB;break;
+    }
+    
+    // Input size
+    h_header[head_size++] = inSize;
+    h_header[head_size++] = inSize >> 8;
+    h_header[head_size++] = inSize >> 16;
+    h_header[head_size++] = inSize >> 24;
+    h_header[head_size++] = 0;
+    h_header[head_size++] = 0;
+    h_header[head_size++] = 0;
+    h_header[head_size++] = 0;
+    
+    // XXHASH value 
+    h_header[head_size++] = xxhash_val;
+    return(head_size);
+}
 
 // Destructor
 xil_lz4::~xil_lz4(){
@@ -141,78 +214,11 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
 
     //Pre Processing
     for (uint32_t i = 0; i < inVec.size(); i++) {
-        // Default value set to 64K
-        uint8_t block_size_header = 0;
-        switch(m_block_size_in_kb) {
-
-            case 64:
-                    block_size_header = BSIZE_STD_64KB;
-                    break;
-            case 256:
-                     block_size_header = BSIZE_STD_256KB;
-                     break;
-            case 1024:
-                      block_size_header = BSIZE_STD_1024KB;
-                      break;
-            case 4096:
-                      block_size_header = BSIZE_STD_4096KB;
-                      break;
-            default:
-                    block_size_header = BSIZE_STD_64KB;
-                    std::cout << "Valid block size not given, setting to 64K"<<std::endl;
-                    break;
-        }
-
-        uint8_t temp_buff[10] = {FLG_BYTE,
-                                 block_size_header,
-                                 inSizeVec[i],
-                                 inSizeVec[i] >> 8,
-                                 inSizeVec[i] >> 16,
-                                 inSizeVec[i] >> 24,
-                                 0,0,0,0
-                                };
-
-        // xxhash is used to calculate hash value
-        uint32_t xxh = XXH32(temp_buff, 10, 0);
-        // This value is sent to Kernel 2
-        uint32_t xxhash_val = (xxh>>8);
-
-
-        uint32_t block_size_in_bytes = m_block_size_in_kb * 1024;
-
-        // Header information
-        uint32_t head_size = 0;
         uint8_t* h_header = (uint8_t*) aligned_alloc(4096,200);
         uint32_t* h_blksize = (uint32_t*) aligned_alloc(4096,200);
         uint32_t* h_lz4outSize = (uint32_t*) aligned_alloc(4096,200);
-
-        h_header[head_size++] = MAGIC_BYTE_1;
-        h_header[head_size++] = MAGIC_BYTE_2;
-        h_header[head_size++] = MAGIC_BYTE_3;
-        h_header[head_size++] = MAGIC_BYTE_4;
-
-        h_header[head_size++] = FLG_BYTE;
-
-        // Value
-        switch(m_block_size_in_kb) {
-            case 64:h_header[head_size++]   = BSIZE_STD_64KB;  break;
-            case 256:h_header[head_size++]  = BSIZE_STD_256KB; break;
-            case 1024:h_header[head_size++] = BSIZE_STD_1024KB;break;
-            case 4096:h_header[head_size++] = BSIZE_STD_4096KB;break;
-        }
-
-        // Input size
-        h_header[head_size++] = inSizeVec[i];
-        h_header[head_size++] = inSizeVec[i] >> 8;
-        h_header[head_size++] = inSizeVec[i] >> 16;
-        h_header[head_size++] = inSizeVec[i] >> 24;
-        h_header[head_size++] = 0;
-        h_header[head_size++] = 0;
-        h_header[head_size++] = 0;
-        h_header[head_size++] = 0;
-
-        // XXHASH value 
-        h_header[head_size++] = xxhash_val;
+        uint32_t block_size_in_bytes = m_block_size_in_kb * 1024;
+        uint32_t head_size = create_header(h_header, inSizeVec[i]);
         headerSizeVec.push_back(head_size);
         h_headerVec.push_back(h_header);
         h_blkSizeVec.push_back(h_blksize);

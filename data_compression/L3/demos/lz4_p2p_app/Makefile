@@ -237,7 +237,7 @@ clean: cleanh
 $(BUILD_DIR)/emconfig.json :
 		emconfigutil --platform $(XPLATFORM) --od $(BUILD_DIR)
 
-HOST_ARGS = -cx $(XCLBIN_FILE_C) -l test.list
+HOST_ARGS = -cx $(XCLBIN_FILE_C) -l test.list -p2p 0
 $(info HOST_ARGS=$(HOST_ARGS))
 
 ifeq ($(TARGET),sw_emu)

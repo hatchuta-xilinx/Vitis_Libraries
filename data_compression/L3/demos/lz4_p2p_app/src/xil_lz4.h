@@ -92,7 +92,6 @@ class xil_lz4 {
             file.seekg(0,file.beg);
             return file_size;
         }
-        uint64_t get_event_duration_ns(const cl::Event &event);
         // Binary flow compress/decompress        
         bool m_bin_flow;        
         
@@ -110,6 +109,8 @@ class xil_lz4 {
         cl::CommandQueue *m_q;
         cl::Kernel* compress_kernel_lz4;
         cl::Kernel* packer_kernel_lz4;
+        uint64_t get_event_duration_ns(const cl::Event &event);
+        size_t create_header(uint8_t* h_header, uint32_t inSize);
         
         // Kernel names 
         std::vector<std::string> compress_kernel_names = {"xilLz4Compress"
