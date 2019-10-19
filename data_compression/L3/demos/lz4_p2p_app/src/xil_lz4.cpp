@@ -342,34 +342,36 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
         packer_kernel_lz4->setArg(narg++, tail_bytes);
     }
 
-    std::vector<cl::Event> compWait[inVec.size()];
-    std::vector<cl::Event> packWait[inVec.size()];
 
     auto total_start = std::chrono::high_resolution_clock::now();
     for (uint32_t i = 0; i < inVec.size(); i++) {
         /* Transfer data from host to device
         * In p2p case, no need to transfer buffer input to device from host.
         */
-        std::vector<cl::Memory> inBufVec;
+        cl::Event write_event, comp_event, pack_event;
+        std::vector<cl::Event> writeWait;
+        std::vector<cl::Event> compWait;
+        std::vector<cl::Event> packWait;
 
+        std::vector<cl::Memory> inBufVec;
         inBufVec.push_back(*(bufInputVec[i]));
         inBufVec.push_back(*(bufblockSizeVec[i]));
 
         // Migrate memory - Map host to device buffers
-        m_q->enqueueMigrateMemObjects(inBufVec, 0 /* 0 means from host*/);
-        m_q->finish();
-        cl::Event comp_event, pack_event;
+        m_q->enqueueMigrateMemObjects({*(bufInputVec[i]), *(bufblockSizeVec[i])}
+                , 0/* 0 means from host*/, NULL, &write_event);
 
+        writeWait.push_back(write_event);
         // Fire compress kernel
-        m_q->enqueueTask(*compress_kernel_lz4, NULL, &comp_event);
-        compWait[i].push_back(comp_event);
+        m_q->enqueueTask(*compress_kernel_lz4, &writeWait, &comp_event);
 
+        compWait.push_back(comp_event);
         // Fire packer kernel
-        m_q->enqueueTask(*packer_kernel_lz4, &compWait[i], &pack_event);
-        packWait[i].push_back(pack_event);
+        m_q->enqueueTask(*packer_kernel_lz4, &compWait, &pack_event);
 
+        packWait.push_back(pack_event);
         // Read back data
-        m_q->enqueueMigrateMemObjects({*(buflz4OutSizeVec[i])}, CL_MIGRATE_MEM_OBJECT_HOST, &packWait[i], NULL);
+        m_q->enqueueMigrateMemObjects({*(buflz4OutSizeVec[i])}, CL_MIGRATE_MEM_OBJECT_HOST, &packWait, NULL);
     }
     m_q->finish();
     auto total_end = std::chrono::high_resolution_clock::now();   
