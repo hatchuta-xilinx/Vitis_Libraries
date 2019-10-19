@@ -135,6 +135,11 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
     std::vector<uint8_t*> h_headerVec;
     std::vector<uint32_t*> h_blkSizeVec;
     std::vector<uint32_t*> h_lz4OutSizeVec;
+    std::vector<cl::Event*> opFinishEvent;
+    std::vector<uint32_t> compressSizeVec;
+
+    //only for Non-P2P
+    std::vector<uint8_t *> compressDataInHostVec;
 
     int ret = 0;
 
@@ -219,6 +224,12 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
         h_blkSizeVec.push_back(h_blksize);
         h_lz4OutSizeVec.push_back(h_lz4outSize);
 
+        if(!enable_p2p){
+            //Creating Host memory to read the compressed data back to host for non-p2p flow case
+            uint8_t* compressData = new uint8_t [inSizeVec[i]];
+            compressDataInHostVec.push_back(compressData);
+        }
+
         // Total chunks in input file
         // For example: Input file size is 12MB and Host buffer size is 2MB
         // Then we have 12/2 = 6 chunks exists 
@@ -284,13 +295,9 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
                                                          head_size * sizeof(uint8_t),
                                                          h_headerVec[i]);
         bufheadVec.push_back(buffer_header);
+        cl::Event* event = new cl::Event();
+        opFinishEvent.push_back(event);
 
-        std::chrono::duration<double, std::nano> packer_kernel_time_ns_1(0);
-        std::chrono::duration<double, std::nano> comp_kernel_time_ns_1(0);
-        uint64_t total_p2p_read_time = 0, total_p2p_write_time = 0;
-        
-        uint32_t offset = 0;
-        uint32_t tail_bytes = 0;
         // Main loop of overlap execution
         // Loop below runs over total bricks i.e., host buffer size chunks
         // Figure out block sizes per brick
@@ -323,6 +330,8 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
         compress_kernel_lz4->setArg(narg++, m_block_size_in_kb);
         compress_kernel_lz4->setArg(narg++, inSizeVec[i]);
         
+        uint32_t offset = 0;
+        uint32_t tail_bytes = 0;
         tail_bytes = 1;        
         uint32_t no_blocks_calc = (inSizeVec[i] - 1) / (m_block_size_in_kb * 1024) + 1;
 
@@ -371,12 +380,12 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
 
         packWait.push_back(pack_event);
         // Read back data
-        m_q->enqueueMigrateMemObjects({*(buflz4OutSizeVec[i])}, CL_MIGRATE_MEM_OBJECT_HOST, &packWait, NULL);
+        m_q->enqueueMigrateMemObjects({*(buflz4OutSizeVec[i])}, CL_MIGRATE_MEM_OBJECT_HOST, &packWait, opFinishEvent[i]);
     }
-    m_q->finish();
-    auto total_end = std::chrono::high_resolution_clock::now();   
 
+    uint64_t total_file_size = 0; 
     for (uint32_t i = 0; i < inVec.size(); i++) {
+        opFinishEvent[i]->wait();
         uint32_t compressed_size = *(h_lz4OutSizeVec[i]);
         uint32_t align_4k = compressed_size / RESIDUE_4K;
         uint32_t outIdx_align = RESIDUE_4K * align_4k;
@@ -384,7 +393,6 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
         uint8_t empty_buffer[4096] = {0};
         // Counter which helps in tracking
         // Output buffer index    
-        uint32_t outIdx = 0;
         uint8_t *temp;
 
         temp = (uint8_t*)bufp2pOutVec[i];
@@ -393,6 +401,7 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
         temp = temp + compressed_size;
         memcpy(temp, empty_buffer, RESIDUE_4K-residue_size);
         compressed_size = outIdx_align + RESIDUE_4K;
+        compressSizeVec.push_back(compressed_size);
 
         if (enable_p2p) {
             //uncomment after enabling for p2p
@@ -401,24 +410,25 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
                 std::cout<<"P2P: write() failed with error: "<<ret<<", line: "<<__LINE__<<std::endl;
             close(fd_p2p_vec[i]);
         }else {
-            std::ofstream outFile(outFileVec[i].c_str(), std::ofstream::binary);
-            // Testing purpose on non-p2p platform
-            char* compressData = new char [inSizeVec[i]];
-            m_q->enqueueReadBuffer(*(buflz4OutVec[i]), 0, 0, compressed_size, compressData);        
-            m_q->finish();
-            outFile.write((char*)compressData, compressed_size);            
-            delete(compressData);
-            outFile.close();
+            m_q->enqueueReadBuffer(*(buflz4OutVec[i]), 0, 0, compressed_size, compressDataInHostVec[i]);        
         }
+        total_file_size += inSizeVec[i];
 
-        outIdx += compressed_size;
-        auto time_ns = std::chrono::duration<double, std::nano>(total_end - total_start);
-        float throughput_in_mbps_1 = (float)inSizeVec[i] * 1000 / time_ns.count();
-
-        std::cout << "\nThroughput (MBps):" << std::fixed << std::setprecision(2) << throughput_in_mbps_1;
     }
-   
-    for (uint32_t i = 0; i < inVec.size(); i++) { 
+    auto total_end = std::chrono::high_resolution_clock::now();   
+    auto time_ns = std::chrono::duration<double, std::nano>(total_end - total_start);
+    float throughput_in_mbps_1 = (float)total_file_size * 1000 / time_ns.count();
+
+    std::cout << "\nThroughput (MBps):" << std::fixed << std::setprecision(2) << throughput_in_mbps_1;
+  
+    //Post Processing and cleanup 
+    for (uint32_t i = 0; i < inVec.size(); i++) {
+       if(!enable_p2p){
+            std::ofstream outFile(outFileVec[i].c_str(), std::ofstream::binary);
+            outFile.write((char*)compressDataInHostVec[i], compressSizeVec[i]);            
+            outFile.close();
+            delete compressDataInHostVec[i];
+       }
         delete (bufInputVec[i]);
         delete (bufOutputVec[i]);
         delete (buflz4OutVec[i]);
