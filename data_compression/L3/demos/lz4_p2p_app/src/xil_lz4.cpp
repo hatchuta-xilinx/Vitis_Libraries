@@ -58,13 +58,6 @@ uint64_t xil_lz4::get_event_duration_ns(const cl::Event &event){
 // Constructor
 xil_lz4::xil_lz4(const std::string& binaryFileName, uint8_t device_id){
             // Index calculation
-#if 0
-            h_blksize.resize(MAX_NUMBER_BLOCKS);
-            h_lz4OutSize[0].resize(RESIDUE_4K);
-            h_lz4OutSize[1].resize(RESIDUE_4K);
-            h_header.resize(RESIDUE_4K);
-#endif
-#if 1
              // The get_xil_devices will return vector of Xilinx Devices 
     std::vector<cl::Device> devices = xcl::get_xil_devices();
 
@@ -103,7 +96,6 @@ xil_lz4::xil_lz4(const std::string& binaryFileName, uint8_t device_id){
     // Create Compress kernels
     compress_kernel_lz4 = new cl::Kernel(*m_program, compress_kernel_names[0].c_str());
     packer_kernel_lz4 = new cl::Kernel(*m_program, packer_kernel_names[0].c_str());
-#endif
 }   
 
 // Destructor
@@ -136,6 +128,7 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
     std::vector<uint32_t*> h_blkSizeVec;
     std::vector<uint32_t*> h_lz4OutSizeVec;
     std::vector<cl::Event*> opFinishEvent;
+    std::vector<uint32_t> headerSizeVec;
     std::vector<uint32_t> compressSizeVec;
 
     //only for Non-P2P
@@ -220,6 +213,7 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
 
         // XXHASH value 
         h_header[head_size++] = xxhash_val;
+        headerSizeVec.push_back(head_size);
         h_headerVec.push_back(h_header);
         h_blkSizeVec.push_back(h_blksize);
         h_lz4OutSizeVec.push_back(h_lz4outSize);
@@ -321,6 +315,28 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
         }
 
 
+    }
+
+
+    auto total_start = std::chrono::high_resolution_clock::now();
+    for (uint32_t i = 0; i < inVec.size(); i++) {
+        /* Transfer data from host to device
+        * In p2p case, no need to transfer buffer input to device from host.
+        */
+        cl::Event write_event, comp_event, pack_event;
+        std::vector<cl::Event> writeWait;
+        std::vector<cl::Event> compWait;
+        std::vector<cl::Event> packWait;
+
+        std::vector<cl::Memory> inBufVec;
+        inBufVec.push_back(*(bufInputVec[i]));
+        inBufVec.push_back(*(bufblockSizeVec[i]));
+
+        // Migrate memory - Map host to device buffers
+        m_q->enqueueMigrateMemObjects({*(bufInputVec[i]), *(bufblockSizeVec[i])}
+                , 0/* 0 means from host*/, NULL, &write_event);
+
+        writeWait.push_back(write_event);
         // Set kernel arguments
         int narg = 0;
         compress_kernel_lz4->setArg(narg++, *(bufInputVec[i]));
@@ -344,33 +360,11 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
         packer_kernel_lz4->setArg(narg++, *(bufblockSizeVec[i]));
         packer_kernel_lz4->setArg(narg++, *(buflz4OutSizeVec[i]));
         packer_kernel_lz4->setArg(narg++, *(bufInputVec[i]));
-        packer_kernel_lz4->setArg(narg++, head_size);
+        packer_kernel_lz4->setArg(narg++, headerSizeVec[i]);
         packer_kernel_lz4->setArg(narg++, offset);
         packer_kernel_lz4->setArg(narg++, m_block_size_in_kb);
         packer_kernel_lz4->setArg(narg++, no_blocks_calc);
         packer_kernel_lz4->setArg(narg++, tail_bytes);
-    }
-
-
-    auto total_start = std::chrono::high_resolution_clock::now();
-    for (uint32_t i = 0; i < inVec.size(); i++) {
-        /* Transfer data from host to device
-        * In p2p case, no need to transfer buffer input to device from host.
-        */
-        cl::Event write_event, comp_event, pack_event;
-        std::vector<cl::Event> writeWait;
-        std::vector<cl::Event> compWait;
-        std::vector<cl::Event> packWait;
-
-        std::vector<cl::Memory> inBufVec;
-        inBufVec.push_back(*(bufInputVec[i]));
-        inBufVec.push_back(*(bufblockSizeVec[i]));
-
-        // Migrate memory - Map host to device buffers
-        m_q->enqueueMigrateMemObjects({*(bufInputVec[i]), *(bufblockSizeVec[i])}
-                , 0/* 0 means from host*/, NULL, &write_event);
-
-        writeWait.push_back(write_event);
         // Fire compress kernel
         m_q->enqueueTask(*compress_kernel_lz4, &writeWait, &comp_event);
 
