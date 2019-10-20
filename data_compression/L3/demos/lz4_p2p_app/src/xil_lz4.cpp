@@ -256,7 +256,7 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
         bufInputVec.push_back(buffer_input);
         // K2 Output:- This buffer contains compressed data written by device
         cl::Buffer* buffer_lz4out = new cl::Buffer(*m_context, 
-                                            CL_MEM_READ_WRITE | CL_MEM_EXT_PTR_XILINX,
+                                            CL_MEM_WRITE_ONLY | CL_MEM_EXT_PTR_XILINX,
                                                 inSizeVec[i],
                                             &(lz4Ext));
         buflz4OutVec.push_back(buffer_lz4out);
@@ -266,14 +266,14 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
         // K1 Output:- This buffer contains compressed data written by device
         // K2 Input:- This is a input to data packer kernel
         cl::Buffer* buffer_output = new cl::Buffer(*m_context, 
-                                            CL_MEM_READ_WRITE,
+                                            CL_MEM_WRITE_ONLY,
                                             inSizeVec[i]
                                             );
         bufOutputVec.push_back(buffer_output);
        
         // K2 input:- This buffer contains compressed data written by device
         cl::Buffer* buffer_lz4OutSize = new cl::Buffer(*m_context, 
-                                            CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE,
+                                            CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY,
                                             10 * sizeof(uint32_t),
                                             h_lz4OutSizeVec[i]);
         buflz4OutSizeVec.push_back(buffer_lz4OutSize);
@@ -281,20 +281,20 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
         // K1 Ouput:- This buffer contains compressed block sizes
         // K2 Input:- This buffer is used in data packer kernel
         cl::Buffer* buffer_compressed_size = new cl::Buffer(*m_context, 
-                                                    CL_MEM_READ_WRITE,
+                                                    CL_MEM_WRITE_ONLY,
                                                     num_blocks * sizeof(uint32_t));
         bufCompSizeVec.push_back(buffer_compressed_size);
 
         // Input:- This buffer contains original input block sizes
         cl::Buffer* buffer_block_size = new cl::Buffer(*m_context, 
-                                                 CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE,
+                                                 CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,
                                                  num_blocks * sizeof(uint32_t),
                                                  h_blkSizeVec[i]);
         bufblockSizeVec.push_back(buffer_block_size);
 
         // Input:- Header buffer only used once
         cl::Buffer* buffer_header = new cl::Buffer(*m_context, 
-                                                 CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE,
+                                                 CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,
                                                          head_size * sizeof(uint8_t),
                                                          h_headerVec[i]);
         bufheadVec.push_back(buffer_header);
