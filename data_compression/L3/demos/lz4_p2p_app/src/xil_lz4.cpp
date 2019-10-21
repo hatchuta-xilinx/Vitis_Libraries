@@ -91,11 +91,6 @@ xil_lz4::xil_lz4(const std::string& binaryFileName, uint8_t device_id){
     devices.resize(1);
 
     m_program = new cl::Program(*m_context, devices, bins);
-    
-   
-    // Create Compress kernels
-    compress_kernel_lz4 = new cl::Kernel(*m_program, compress_kernel_names[0].c_str());
-    packer_kernel_lz4 = new cl::Kernel(*m_program, packer_kernel_names[0].c_str());
 } 
 
 size_t xil_lz4::create_header(uint8_t* h_header, uint32_t inSize)
@@ -173,7 +168,10 @@ size_t xil_lz4::create_header(uint8_t* h_header, uint32_t inSize)
 
 // Destructor
 xil_lz4::~xil_lz4(){
-    delete(compress_kernel_lz4);
+    for (uint8_t i = 0; i < MAX_COMPUTE_UNITS; i++){
+        delete(compress_kernel_lz4[i]);
+        delete(packer_kernel_lz4[i]);
+    }
     delete(m_program);
     delete(m_q);
     delete(m_context);
@@ -211,6 +209,12 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
 
     uint64_t total_kernel_time = 0;
     uint64_t total_packer_kernel_time = 0;
+    std::chrono::duration<double, std::nano> total_ssd_time_ns(0);
+
+    for (uint8_t i = 0; i < MAX_COMPUTE_UNITS; i++) {
+        compress_kernel_lz4[i] = NULL;
+        packer_kernel_lz4[i] = NULL;
+    }
 
     //Pre Processing
     for (uint32_t i = 0; i < inVec.size(); i++) {
@@ -223,6 +227,9 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
         h_headerVec.push_back(h_header);
         h_blkSizeVec.push_back(h_blksize);
         h_lz4OutSizeVec.push_back(h_lz4outSize);
+
+        std::string comp_kname = compress_kernel_names[0];
+        std::string pack_kname = packer_kernel_names[0];
 
         if(!enable_p2p){
             //Creating Host memory to read the compressed data back to host for non-p2p flow case
@@ -238,15 +245,30 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
         // operations
         
         uint32_t num_blocks = (inSizeVec[i] - 1)/block_size_in_bytes + 1;
-
         // DDR buffer extensions
         cl_mem_ext_ptr_t lz4Ext;
-        if (enable_p2p) 
+        if (enable_p2p)
             lz4Ext.flags = XCL_MEM_DDR_BANK0 | XCL_MEM_EXT_P2P_BUFFER;
         else
             lz4Ext.flags = XCL_MEM_DDR_BANK0;
         lz4Ext.param   = NULL;
         lz4Ext.obj   = nullptr;
+
+        int cu_num = i%2;
+
+        if (cu_num==0) {
+            comp_kname += ":{xilLz4Compress_1}";
+            pack_kname += ":{xil_lz4_packer_cu1_1}";
+        } else {
+            comp_kname += ":{xilLz4Compress_2}";
+            pack_kname += ":{xil_lz4_packer_cu1_2}";
+        }
+
+        if(!compress_kernel_lz4[cu_num])
+            compress_kernel_lz4[cu_num] = new cl::Kernel(*m_program, comp_kname.c_str());
+
+        if(!packer_kernel_lz4[cu_num])
+            packer_kernel_lz4[cu_num] = new cl::Kernel(*m_program, pack_kname.c_str());
 
         // Device buffer allocation
         // K1 Input:- This buffer contains input chunk data
@@ -323,9 +345,7 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
             fd_p2p_vec.push_back(fd_p2p_c_out);
         }
 
-
     }
-
 
     auto total_start = std::chrono::high_resolution_clock::now();
     for (uint32_t i = 0; i < inVec.size(); i++) {
@@ -337,10 +357,6 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
         std::vector<cl::Event> compWait;
         std::vector<cl::Event> packWait;
 
-        std::vector<cl::Memory> inBufVec;
-        inBufVec.push_back(*(bufInputVec[i]));
-        inBufVec.push_back(*(bufblockSizeVec[i]));
-
         // Migrate memory - Map host to device buffers
         m_q->enqueueMigrateMemObjects({*(bufInputVec[i]), *(bufblockSizeVec[i])}
                 , 0/* 0 means from host*/, NULL, &write_event);
@@ -348,12 +364,13 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
         writeWait.push_back(write_event);
         // Set kernel arguments
         int narg = 0;
-        compress_kernel_lz4->setArg(narg++, *(bufInputVec[i]));
-        compress_kernel_lz4->setArg(narg++, *(bufOutputVec[i]));
-        compress_kernel_lz4->setArg(narg++, *(bufCompSizeVec[i]));
-        compress_kernel_lz4->setArg(narg++, *(bufblockSizeVec[i]));
-        compress_kernel_lz4->setArg(narg++, m_block_size_in_kb);
-        compress_kernel_lz4->setArg(narg++, inSizeVec[i]);
+        int cu_num = i%2;
+        compress_kernel_lz4[cu_num]->setArg(narg++, *(bufInputVec[i]));
+        compress_kernel_lz4[cu_num]->setArg(narg++, *(bufOutputVec[i]));
+        compress_kernel_lz4[cu_num]->setArg(narg++, *(bufCompSizeVec[i]));
+        compress_kernel_lz4[cu_num]->setArg(narg++, *(bufblockSizeVec[i]));
+        compress_kernel_lz4[cu_num]->setArg(narg++, m_block_size_in_kb);
+        compress_kernel_lz4[cu_num]->setArg(narg++, inSizeVec[i]);
         
         uint32_t offset = 0;
         uint32_t tail_bytes = 0;
@@ -362,24 +379,24 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
 
         // K2 Set Kernel arguments
         narg = 0;
-        packer_kernel_lz4->setArg(narg++, *(bufOutputVec[i]));
-        packer_kernel_lz4->setArg(narg++, *(buflz4OutVec[i]));
-        packer_kernel_lz4->setArg(narg++, *(bufheadVec[i]));
-        packer_kernel_lz4->setArg(narg++, *(bufCompSizeVec[i]));
-        packer_kernel_lz4->setArg(narg++, *(bufblockSizeVec[i]));
-        packer_kernel_lz4->setArg(narg++, *(buflz4OutSizeVec[i]));
-        packer_kernel_lz4->setArg(narg++, *(bufInputVec[i]));
-        packer_kernel_lz4->setArg(narg++, headerSizeVec[i]);
-        packer_kernel_lz4->setArg(narg++, offset);
-        packer_kernel_lz4->setArg(narg++, m_block_size_in_kb);
-        packer_kernel_lz4->setArg(narg++, no_blocks_calc);
-        packer_kernel_lz4->setArg(narg++, tail_bytes);
+        packer_kernel_lz4[cu_num]->setArg(narg++, *(bufOutputVec[i]));
+        packer_kernel_lz4[cu_num]->setArg(narg++, *(buflz4OutVec[i]));
+        packer_kernel_lz4[cu_num]->setArg(narg++, *(bufheadVec[i]));
+        packer_kernel_lz4[cu_num]->setArg(narg++, *(bufCompSizeVec[i]));
+        packer_kernel_lz4[cu_num]->setArg(narg++, *(bufblockSizeVec[i]));
+        packer_kernel_lz4[cu_num]->setArg(narg++, *(buflz4OutSizeVec[i]));
+        packer_kernel_lz4[cu_num]->setArg(narg++, *(bufInputVec[i]));
+        packer_kernel_lz4[cu_num]->setArg(narg++, headerSizeVec[i]);
+        packer_kernel_lz4[cu_num]->setArg(narg++, offset);
+        packer_kernel_lz4[cu_num]->setArg(narg++, m_block_size_in_kb);
+        packer_kernel_lz4[cu_num]->setArg(narg++, no_blocks_calc);
+        packer_kernel_lz4[cu_num]->setArg(narg++, tail_bytes);
         // Fire compress kernel
-        m_q->enqueueTask(*compress_kernel_lz4, &writeWait, &comp_event);
+        m_q->enqueueTask(*compress_kernel_lz4[cu_num], &writeWait, &comp_event);
 
         compWait.push_back(comp_event);
         // Fire packer kernel
-        m_q->enqueueTask(*packer_kernel_lz4, &compWait, &pack_event);
+        m_q->enqueueTask(*packer_kernel_lz4[cu_num], &compWait, &pack_event);
 
         packWait.push_back(pack_event);
         // Read back data
@@ -387,6 +404,7 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
     }
 
     uint64_t total_file_size = 0; 
+    uint64_t comp_file_size = 0; 
     for (uint32_t i = 0; i < inVec.size(); i++) {
         opFinishEvent[i]->wait();
         uint32_t compressed_size = *(h_lz4OutSizeVec[i]);
@@ -407,22 +425,29 @@ void xil_lz4::compress_in_line_multiple_files(std::vector<char *> &inVec,
         compressSizeVec.push_back(compressed_size);
 
         if (enable_p2p) {
-            //uncomment after enabling for p2p
+            auto ssd_start = std::chrono::high_resolution_clock::now();   
             ret = write(fd_p2p_vec[i],  bufp2pOutVec[i], compressed_size);
             if (ret == -1)
                 std::cout<<"P2P: write() failed with error: "<<ret<<", line: "<<__LINE__<<std::endl;
+            auto ssd_end = std::chrono::high_resolution_clock::now();
+            auto ssd_time_ns =  std::chrono::duration<double, std::nano>(ssd_end - ssd_start);
+            total_ssd_time_ns += ssd_time_ns;
             close(fd_p2p_vec[i]);
         }else {
             m_q->enqueueReadBuffer(*(buflz4OutVec[i]), 0, 0, compressed_size, compressDataInHostVec[i]);        
         }
         total_file_size += inSizeVec[i];
+        comp_file_size  += compressed_size;
 
     }
     auto total_end = std::chrono::high_resolution_clock::now();   
+
     auto time_ns = std::chrono::duration<double, std::nano>(total_end - total_start);
     float throughput_in_mbps_1 = (float)total_file_size * 1000 / time_ns.count();
+    float ssd_throughput_in_mbps_1 = (float)comp_file_size* 1000 / total_ssd_time_ns.count();
 
     std::cout << "\nThroughput (MBps):" << std::fixed << std::setprecision(2) << throughput_in_mbps_1;
+    std::cout << "\nSSD Throughput (MBps):" << std::fixed << std::setprecision(2) << ssd_throughput_in_mbps_1;
   
     //Post Processing and cleanup 
     for (uint32_t i = 0; i < inVec.size(); i++) {

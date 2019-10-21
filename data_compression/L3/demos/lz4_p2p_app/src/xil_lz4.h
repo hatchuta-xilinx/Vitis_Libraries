@@ -33,7 +33,7 @@
 #include "defns.h"
 
 // Maximum compute units supported
-#define MAX_COMPUTE_UNITS 1
+#define MAX_COMPUTE_UNITS 2
 
 // Maximum host buffer used to operate
 // per kernel invocation
@@ -107,8 +107,8 @@ class xil_lz4 {
         cl::Program *m_program;
         cl::Context *m_context;
         cl::CommandQueue *m_q;
-        cl::Kernel* compress_kernel_lz4;
-        cl::Kernel* packer_kernel_lz4;
+        cl::Kernel *compress_kernel_lz4[MAX_COMPUTE_UNITS];
+        cl::Kernel *packer_kernel_lz4[MAX_COMPUTE_UNITS];
         uint64_t get_event_duration_ns(const cl::Event &event);
         size_t create_header(uint8_t* h_header, uint32_t inSize);
         

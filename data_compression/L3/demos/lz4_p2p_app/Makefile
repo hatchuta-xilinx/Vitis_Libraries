@@ -105,7 +105,7 @@ VPP_FLAGS = -I$(HLS_SRC_DIR) \
 			 -I$(KSRC_DIR) \
 			 -I$(XFLIB_DIR)/L2/include/
 VPP_FLAGS += -t $(TARGET) --platform $(XPLATFORM) --save-temps
-VPP_FLAGS += --kernel_frequency=250 --xp param:compiler.enableAutoPipelining=false \
+VPP_FLAGS += --kernel_frequency=230 --xp param:compiler.enableAutoPipelining=false \
 			  -DPARALLEL_BLOCK=$(PARALLEL_BLOCK)
 
 
@@ -152,7 +152,11 @@ $(XCLBIN_FILE_C): $(TEMP_DIR)/xf_packer.xo $(TEMP_DIR)/xf_compress.xo
 	--sp $(PACKER_KERNEL_NAME)_1.m_axi_gmem1:bank0 \
 	--sp $(COMPRESS_KERNEL_NAME)_1.m_axi_gmem0:bank0 \
 	--sp $(COMPRESS_KERNEL_NAME)_1.m_axi_gmem1:bank0 \
-	--nk $(PACKER_KERNEL_NAME):1 --nk $(COMPRESS_KERNEL_NAME):1 \
+	--sp $(PACKER_KERNEL_NAME)_2.m_axi_gmem0:bank0 \
+	--sp $(PACKER_KERNEL_NAME)_2.m_axi_gmem1:bank0 \
+	--sp $(COMPRESS_KERNEL_NAME)_2.m_axi_gmem0:bank0 \
+	--sp $(COMPRESS_KERNEL_NAME)_2.m_axi_gmem1:bank0 \
+	--nk $(PACKER_KERNEL_NAME):2 --nk $(COMPRESS_KERNEL_NAME):2 \
 	-o'$@' $(+)
 
 
@@ -237,7 +241,7 @@ clean: cleanh
 $(BUILD_DIR)/emconfig.json :
 		emconfigutil --platform $(XPLATFORM) --od $(BUILD_DIR)
 
-HOST_ARGS = -cx $(XCLBIN_FILE_C) -p2p 0 -l test.list
+HOST_ARGS = -cx $(XCLBIN_FILE_C) -p2p 1 -l test.list
 $(info HOST_ARGS=$(HOST_ARGS))
 
 ifeq ($(TARGET),sw_emu)
