@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="xf_compress" dir="">
+  <FileSets>
+    <FileSet Name="kernel_xilLz4Compress" Type="DesignSrcs">
+      <File Path="/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src/lz4_compress_mm.cpp"/>
+      <Config/>
+    </FileSet>
+  </FileSets>
+  <Runs/>
+</project>

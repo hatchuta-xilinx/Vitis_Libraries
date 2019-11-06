@@ -164,7 +164,7 @@ class xfLz4 {
     /**
      * Binary flow compress/decompress
      */
-    bool m_bin_flow;
+    uint8_t m_bin_flow;
 
     /**
      * Block Size

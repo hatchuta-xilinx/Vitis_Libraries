@@ -28,23 +28,6 @@
 
 #include "snappy_compress_mm.hpp"
 
-#define GMEM_DWIDTH 512
-#define GMEM_BURST_SIZE 16
-
-#define MIN_BLOCK_SIZE 16
-
-// LZ specific Defines
-#define BIT 8
-#define MIN_OFFSET 1
-#define MIN_MATCH 4
-#define LZ_MAX_OFFSET_LIMIT 65536
-#define LZ_HASH_BIT 12
-#define LZ_DICT_SIZE (1 << LZ_HASH_BIT)
-#define MAX_MATCH_LEN 64
-#define OFFSET_WINDOW 65536
-#define MATCH_LEN 6
-#define MATCH_LEVEL 6
-
 const int c_snappyMaxLiteralStream = MAX_LIT_STREAM_SIZE;
 
 // namespace hw_compress {
@@ -62,7 +45,6 @@ void snappyCore(hls::stream<xf::compression::uintMemWidth_t>& inStreamMemWidth,
     hls::stream<xf::compression::compressd_dt> bestMatchStream("bestMatchStream");
     hls::stream<xf::compression::compressd_dt> boosterStream("boosterStream");
     hls::stream<uint8_t> litOut("litOut");
-    hls::stream<xf::compression::snappy_compressd_dt> lenOffsetOut("lenOffsetOut");
     hls::stream<ap_uint<8> > snappyOut("snappyOut");
     hls::stream<bool> snappyOut_eos("snappyOut_eos");
 #pragma HLS STREAM variable = inStream depth = 8
@@ -70,14 +52,12 @@ void snappyCore(hls::stream<xf::compression::uintMemWidth_t>& inStreamMemWidth,
 #pragma HLS STREAM variable = bestMatchStream depth = 8
 #pragma HLS STREAM variable = boosterStream depth = 8
 #pragma HLS STREAM variable = litOut depth = c_snappyMaxLiteralStream
-#pragma HLS STREAM variable = lenOffsetOut depth = c_gmemBurstSize
 #pragma HLS STREAM variable = snappyOut depth = 8
 #pragma HLS STREAM variable = snappyOut_eos depth = 8
 
 #pragma HLS RESOURCE variable = inStream core = FIFO_SRL
 #pragma HLS RESOURCE variable = compressdStream core = FIFO_SRL
 #pragma HLS RESOURCE variable = boosterStream core = FIFO_SRL
-#pragma HLS RESOURCE variable = lenOffsetOut core = FIFO_SRL
 #pragma HLS RESOURCE variable = snappyOut core = FIFO_SRL
 #pragma HLS RESOURCE variable = snappyOut_eos core = FIFO_SRL
 
@@ -87,10 +67,10 @@ void snappyCore(hls::stream<xf::compression::uintMemWidth_t>& inStreamMemWidth,
         inStream, compressdStream, input_size, left_bytes);
     xf::compression::lzBestMatchFilter<MATCH_LEN, OFFSET_WINDOW>(compressdStream, bestMatchStream, input_size,
                                                                  left_bytes);
-    xf::compression::lzBooster<MAX_MATCH_LEN, OFFSET_WINDOW>(bestMatchStream, boosterStream, input_size, left_bytes);
-    xf::compression::snappyDivide<MAX_LIT_COUNT, MAX_LIT_STREAM_SIZE, PARALLEL_BLOCK>(
-        boosterStream, litOut, lenOffsetOut, input_size, max_lit_limit, core_idx);
-    xf::compression::snappyCompress(litOut, lenOffsetOut, snappyOut, snappyOut_eos, compressedSize, input_size);
+    xf::compression::lzBooster<MAX_MATCH_LEN, BOOSTER_OFFSET_WINDOW>(bestMatchStream, boosterStream, input_size,
+                                                                     left_bytes);
+    xf::compression::snappyCompress<MAX_LIT_COUNT, MAX_LIT_STREAM_SIZE, PARALLEL_BLOCK>(
+        boosterStream, snappyOut, max_lit_limit, input_size, snappyOut_eos, compressedSize, core_idx);
     xf::compression::upsizerEos<uint16_t, BIT, GMEM_DWIDTH>(snappyOut, snappyOut_eos, outStreamMemWidth,
                                                             outStreamMemWidthEos);
 }

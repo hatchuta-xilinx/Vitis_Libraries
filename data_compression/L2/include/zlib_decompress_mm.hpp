@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef _XFCOMPRESSION_ZLIB_DECOMPRESS_KERNEL_HPP_
-#define _XFCOMPRESSION_ZLIB_DECOMPRESS_KERNEL_HPP_
+#ifndef _XFCOMPRESSION_ZLIB_DECOMPRESS_MM_HPP_
+#define _XFCOMPRESSION_ZLIB_DECOMPRESS_MM_HPP_
 
 /**
  * @file zlib_decompress_kernel.hpp
@@ -30,14 +30,20 @@
 #include "s2mm.hpp"
 #include "stream_upsizer.hpp"
 #include "stream_downsizer.hpp"
-#include "inflate_trees.hpp"
-#include "inflate_huffman.hpp"
+#include "huffman_decoder.hpp"
 
 #include <stdio.h>
 #include <stdint.h>
 #include <assert.h>
 #include "hls_stream.h"
 #include <ap_int.h>
+
+#define BIT 8
+#define MIN_OFFSET 1
+#define MIN_MATCH 4
+#define LZ_MAX_OFFSET_LIMIT 32768
+#define HISTORY_SIZE LZ_MAX_OFFSET_LIMIT
+#define LOW_OFFSET 10
 
 extern "C" {
 /**

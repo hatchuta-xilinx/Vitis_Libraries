@@ -433,7 +433,8 @@ xilSnappy::xilSnappy(const std::string& binaryFile, uint8_t flow) {
 xilSnappy::~xilSnappy() {
     if (m_bin_flow) {
         delete (compress_kernel_snappy);
-    } else {
+    }
+    if (m_bin_flow == 0 || m_bin_flow == 2) {
         delete (decompress_kernel_snappy);
     }
     delete (m_program);

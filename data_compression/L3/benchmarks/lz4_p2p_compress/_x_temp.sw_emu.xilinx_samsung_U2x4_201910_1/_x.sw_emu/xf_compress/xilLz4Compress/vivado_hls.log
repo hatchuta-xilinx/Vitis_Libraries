@@ -1,0 +1,40 @@
+
+****** Vivado(TM) HLS - High-Level Synthesis from C, C++ and SystemC v2019.1 (64-bit)
+  **** SW Build 2552052 on Fri May 24 14:47:09 MDT 2019
+  **** IP Build 2548770 on Fri May 24 18:01:18 MDT 2019
+    ** Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
+
+source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/scripts/vivado_hls/hls.tcl -notrace
+INFO: [HLS 200-10] Running '/proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/bin/unwrapped/lnx64.o/vivado_hls'
+INFO: [HLS 200-10] For user 'hatchuta' on host 'xhdrdevl135' (Linux_x86_64 version 3.10.0-862.el7.x86_64) on Wed Nov 06 18:48:56 IST 2019
+INFO: [HLS 200-10] On os "CentOS Linux release 7.5.1804 (Core) "
+INFO: [HLS 200-10] In directory '/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress'
+Sourcing Tcl script 'xilLz4Compress.tcl'
+INFO: [HLS 200-10] Creating and opening project '/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress'.
+INFO: [HLS 200-10] Adding design file '/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src/lz4_compress_mm.cpp' to the project
+INFO: [HLS 200-10] Creating and opening solution '/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution'.
+INFO: [HLS 200-10] Setting target device to 'xcku15p-ffva1156-2LV-e'
+INFO: [SYN 201-201] Setting up clock 'default' with a period of 5ns.
+INFO: [HLS 200-435] Setting 'config_sdx -target' configuration: config_export -vivado_optimization_level=0
+INFO: [HLS 200-435] Setting 'config_export -vivado_optimization_level' configuration: config_export -vivado_phys_opt=none
+INFO: [HLS 200-435] Setting 'config_sdx -target' configuration: config_compile -pipeline_loops=64
+INFO: [XFORM 203-1171] Pipeline the innermost loop with trip count more than 64 or its parent loop when its trip count is less than or equal 64.
+INFO: [HLS 200-435] Setting 'config_sdx -target' configuration: config_compile -name_max_length=256
+INFO: [XFORM 203-1161] The maximum of name length is set into 256.
+INFO: [HLS 200-435] Setting 'config_sdx -target' configuration: config_schedule -enable_dsp_full_reg=1
+INFO: [HLS 200-435] Setting 'config_sdx -target' configuration: config_rtl -register_reset_num=3
+INFO: [HLS 200-435] Setting 'config_sdx -target' configuration: config_rtl -module_auto_prefix=1
+INFO: [HLS 200-435] Setting 'config_sdx -target' configuration: config_interface -m_axi_addr64=1
+INFO: [HLS 200-435] Setting 'config_sdx -target' configuration: set_clock_uncertainty 27%
+INFO: [SYN 201-201] Setting up clock 'default' with an uncertainty of 1.35ns.
+INFO: [SYN 201-201] Setting up clock 'default' with an uncertainty of 1.35ns.
+INFO: [SCHED 204-61] Option 'relax_ii_for_timing' is enabled, will increase II to preserve clock frequency constraints.
+INFO: [HLS 200-10] Analyzing design file '/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src/lz4_compress_mm.cpp' ... 
+WARNING: [HLS 214-111] Streams will behave like static variables inside a dataflow region: /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L1/include/hw/lz4_compress.hpp:243:26
+WARNING: [HLS 214-111] Streams will behave like static variables inside a dataflow region: /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src/lz4_compress_mm.cpp:39:30
+WARNING: [HLS 214-114] Since the only kind of statements allowed in a dataflow region are variable declarations and function calls, the compiler may not be able to correctly handle the region: /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src/lz4_compress_mm.cpp:105:5
+WARNING: [HLS 200-471] Dataflow form checks found 3 issue(s) in file /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src/lz4_compress_mm.cpp
+INFO: [HLS 200-111] Finished Linking Time (s): cpu = 00:00:15 ; elapsed = 00:00:20 . Memory (MB): peak = 926.500 ; gain = 128.000 ; free physical = 76322 ; free virtual = 207597
+INFO: [HLS 200-111] Finished Checking Pragmas Time (s): cpu = 00:00:15 ; elapsed = 00:00:20 . Memory (MB): peak = 926.500 ; gain = 128.000 ; free physical = 76322 ; free virtual = 207597
+HLS completed successfully
+INFO: [Common 17-206] Exiting vivado_hls at Wed Nov  6 18:49:16 2019...

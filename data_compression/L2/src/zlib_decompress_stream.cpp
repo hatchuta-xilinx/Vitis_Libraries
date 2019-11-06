@@ -14,69 +14,122 @@
  * limitations under the License.
  *
  */
-/**
- * @file xil_zlib_decompress_stream_kernel.cpp
- * @brief Source for zlib decompression stream kernel.
- *
- * This file is part of Vitis Data Compression Library.
- */
 
 #include "zlib_decompress_stream.hpp"
 
-// LZ specific Defines
-#define MIN_OFFSET 1
-#define MIN_MATCH 4
-#define LZ_MAX_OFFSET_LIMIT 32768
-#define HISTORY_SIZE LZ_MAX_OFFSET_LIMIT
-#define LOW_OFFSET 10
+/**
+ * @brief kStreamReadZlibDecomp Read 16-bit wide data from internal streams output by compression modules
+ *                              and write to output axi stream.
+ *
+ * @param inKStream     input kernel stream
+ * @param readStream    internal stream to be read for processing
+ * @param input_size    input data size
+ *
+ */
+void kStreamReadZlibDecomp(hls::stream<ap_axiu<kGMemDWidth, 0, 0, 0> >& inKStream,
+                           hls::stream<ap_uint<kGMemDWidth> >& readStream,
+                           uint32_t input_size) {
+    int itrLim = 1 + (input_size - 1) / (kGMemDWidth / 8);
+    for (int i = 0; i < itrLim; i++) {
+#pragma HLS PIPELINE II = 1
+        ap_axiu<kGMemDWidth, 0, 0, 0> tmp = inKStream.read();
+        readStream << tmp.data;
+    }
+}
 
-void xil_inflate(hls::stream<xf::compression::hStream16b_t>& inaxistream,
-                 hls::stream<xf::compression::hStream8b_t>& outaxistream,
-                 hls::stream<xf::compression::hStream32b_t>& encodedsize,
+/**
+ * @brief kStreamWriteZlibDecomp Read 16-bit wide data from internal streams output by compression modules
+ *                                and write to output axi stream.
+ *
+ * @param outKStream    output kernel stream
+ * @param sizestreamd   stream to indicate readable bytes in 512-bit wide stream
+ * @param outDataStream output data stream from internal modules
+ * @param byteEos       internal stream which indicates end of data stream
+ * @param dataSize      size of data in streams
+ *
+ */
+void kStreamWriteZlibDecomp(hls::stream<ap_axiu<kGMemDWidth, 0, 0, 0> >& outKStream,
+                            hls::stream<ap_axiu<32, 0, 0, 0> >& sizestreamd,
+                            hls::stream<ap_uint<kGMemDWidth> >& outDataStream,
+                            hls::stream<bool>& byteEos,
+                            hls::stream<uint32_t>& dataSize) {
+    uint32_t outSize = 0;
+    bool lastByte = false;
+    uint32_t pckCount = 0;
+    ap_uint<kGMemDWidth> tmp;
+    ap_axiu<32, 0, 0, 0> pcksize;
+    ap_axiu<kGMemDWidth, 0, 0, 0> t1;
+    pcksize.data = kGMemDWidth / 8;
+
+    for (lastByte = byteEos.read(); !lastByte; pckCount++) {
+#pragma HLS PIPELINE II = 1
+        tmp = outDataStream.read();
+        lastByte = byteEos.read();
+        t1.data = tmp;
+        t1.last = lastByte;
+
+        if (lastByte) {
+            outSize = dataSize.read();
+            pcksize.data = outSize - (pckCount * (kGMemDWidth / 8));
+        }
+
+        sizestreamd.write(pcksize);
+        outKStream.write(t1);
+    }
+    outDataStream.read();
+}
+
+void xil_inflate(hls::stream<ap_axiu<kGMemDWidth, 0, 0, 0> >& inaxistream,
+                 hls::stream<ap_axiu<kGMemDWidth, 0, 0, 0> >& outaxistream,
+                 hls::stream<ap_axiu<32, 0, 0, 0> >& sizestreamd,
                  uint32_t input_size) {
-    hls::stream<ap_uint<16> > outDownStream("outDownStream");
-    hls::stream<xf::compression::streamDt> uncompOutStream("unCompOutStream");
+    hls::stream<uintMemWidth_t> instream512("inputStream");
+    hls::stream<ap_uint<16> > outdownstream("outDownStream");
+    hls::stream<ap_uint<8> > uncompoutstream("unCompOutStream");
     hls::stream<bool> byte_eos("byteEndOfStream");
-    hls::stream<xf::compression::compressd_dt> bitUnPackStream("bitUnPackStream");
-    hls::stream<bool> bitEndOfStream("bitEndOfStream");
 
-#pragma HLS STREAM variable = outDownStream depth = 16
-#pragma HLS STREAM variable = uncompOutStream depth = 32
-#pragma HLS STREAM variable = byte_eos depth = 32
-#pragma HLS STREAM variable = bitUnPackStream depth = 32
-#pragma HLS STREAM variable = bitEndOfStream depth = 32
+    hls::stream<xf::compression::compressd_dt> bitunpackstream("bitUnPackStream");
+    hls::stream<bool> bitendofstream("bitEndOfStream");
+    hls::stream<uintMemWidth_t> outstream512("outputStream");
+    hls::stream<bool> outstream512_eos("outputStreamSize");
 
-#pragma HLS RESOURCE variable = outDownStream core = FIFO_SRL
-#pragma HLS RESOURCE variable = uncompOutStream core = FIFO_SRL
-#pragma HLS RESOURCE variable = byte_eos core = FIFO_SRL
-#pragma HLS RESOURCE variable = bitUnPackStream core = FIFO_SRL
-#pragma HLS RESOURCE variable = bitEndOfStream core = FIFO_SRL
+#pragma HLS STREAM variable = instream512 depth = 32
+#pragma HLS STREAM variable = bitunpackstream depth = 32
+#pragma HLS STREAM variable = bitendofstream depth = 32
+#pragma HLS STREAM variable = outdownstream depth = 32
 
+#pragma HLS STREAM variable = uncompoutstream depth = 64
+#pragma HLS STREAM variable = byte_eos depth = 64
+#pragma HLS STREAM variable = outstream512 depth = 64
+#pragma HLS STREAM variable = outstream512_eos depth = 64
     hls::stream<uint32_t> outsize_val("outsize_val");
 
 #pragma HLS dataflow
-    xf::compression::axis2hlsStream<16>(inaxistream, outDownStream);
 
-    bitUnPacker(outDownStream, bitUnPackStream, bitEndOfStream, input_size);
+    kStreamReadZlibDecomp(inaxistream, instream512, input_size);
+    xf::compression::streamDownsizer<uint32_t, kGMemDWidth, 16>(instream512, outdownstream, input_size);
 
-    xf::compression::lzDecompressZlibEos_new<HISTORY_SIZE, LOW_OFFSET>(bitUnPackStream, bitEndOfStream, uncompOutStream,
+    xf::compression::huffmanDecoder(outdownstream, bitunpackstream, bitendofstream, input_size);
+
+    xf::compression::lzDecompressZlibEos_new<HISTORY_SIZE, LOW_OFFSET>(bitunpackstream, bitendofstream, uncompoutstream,
                                                                        byte_eos, outsize_val);
 
-    xf::compression::hlsStream2axis(uncompOutStream, byte_eos, outaxistream, outsize_val, encodedsize);
+    xf::compression::upsizerEos<uint16_t, 8, kGMemDWidth>(uncompoutstream, byte_eos, outstream512, outstream512_eos);
+    kStreamWriteZlibDecomp(outaxistream, sizestreamd, outstream512, outstream512_eos, outsize_val);
 }
 
 extern "C" {
-void xilZlibDecompressStream(hls::stream<xf::compression::hStream16b_t>& inaxistream,
-                             hls::stream<xf::compression::hStream8b_t>& outaxistream,
-                             hls::stream<xf::compression::hStream32b_t>& encodedsize,
-                             uint32_t input_size) {
-#pragma HLS interface axis port = inaxistream
-#pragma HLS interface axis port = outaxistream
-#pragma HLS interface axis port = encodedsize
-#pragma HLS interface s_axilite port = input_size bundle = control
-#pragma HLS interface s_axilite port = return bundle = control
+void xilDecompressStream(uint32_t input_size,
+                         hls::stream<ap_axiu<kGMemDWidth, 0, 0, 0> >& inaxistreamd,
+                         hls::stream<ap_axiu<kGMemDWidth, 0, 0, 0> >& outaxistreamd,
+                         hls::stream<ap_axiu<32, 0, 0, 0> >& sizestreamd) {
+#pragma HLS INTERFACE s_axilite port = input_size bundle = control
+#pragma HLS interface axis port = inaxistreamd
+#pragma HLS interface axis port = outaxistreamd
+#pragma HLS interface axis port = sizestreamd
+#pragma HLS INTERFACE s_axilite port = return bundle = control
 
-    // printf("In decompress kernel \n");
-    xil_inflate(inaxistream, outaxistream, encodedsize, input_size);
+    // Call for parallel compression
+    xil_inflate(inaxistreamd, outaxistreamd, sizestreamd, input_size);
 }
 }

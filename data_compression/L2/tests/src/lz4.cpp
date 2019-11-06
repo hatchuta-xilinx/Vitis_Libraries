@@ -172,7 +172,8 @@ xfLz4::xfLz4(const std::string& binaryFile, uint8_t flow) {
 xfLz4::~xfLz4() {
     if (m_bin_flow) {
         delete (compress_kernel_lz4);
-    } else {
+    }
+    if (m_bin_flow == 0 || m_bin_flow == 2) {
         delete (decompress_kernel_lz4);
     }
     delete (m_program);

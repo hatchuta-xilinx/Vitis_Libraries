@@ -209,8 +209,6 @@ setup: | check_part
 
 COMPRESS_OUT_DIR:=./build_compress_ip
 
-decompress_srcs+=../../include/hw/lz4_decompress_core.hpp
-
 compress_script=./run_compress_hls.tcl 
 
 compress_ip_out=$(COMPRESS_OUT_DIR)/lz4_compress_test/lz4_compress_stream/impl/ip/component.xml

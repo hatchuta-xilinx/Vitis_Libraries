@@ -32,6 +32,14 @@ void xilDecompressTop(std::string& decompress_mod, std::string& decompress_bin) 
     uint64_t input_size = getFileSize(inFile);
     inFile.close();
 
+    const char* sizes[] = {"B", "kB", "MB", "GB", "TB"};
+    double len = input_size;
+    int order = 0;
+    while (len >= 1000) {
+        order++;
+        len = len / 1000;
+    }
+
     string lz_decompress_in = decompress_mod;
     string lz_decompress_out = decompress_mod;
     lz_decompress_out = lz_decompress_out + ".orig";
@@ -41,7 +49,8 @@ void xilDecompressTop(std::string& decompress_mod, std::string& decompress_bin) 
     // Call LZ4 decompression
     xlz->decompressFile(lz_decompress_in, lz_decompress_out, input_size);
 #ifdef VERBOSE
-    std::cout << std::fixed << std::setprecision(2) << "File Size(MB)\t\t:" << (double)input_size / 1000000 << std::endl
+    std::cout << std::fixed << std::setprecision(3) << std::endl
+              << "File Size(" << sizes[order] << ")\t\t:" << len << std::endl
               << "File Name\t\t:" << lz_decompress_in << std::endl;
     std::cout << "\n";
     std::cout << "Output Location: " << lz_decompress_out.c_str() << std::endl;

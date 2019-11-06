@@ -202,7 +202,7 @@ $(TEMP_DIR)/xf_compress.xo: $(COMPRESS_KERNEL_SRCS) $(HLS_SRC_DIR)
 # xclbin Binary creation
 $(XCLBIN_FILE): $(TEMP_DIR)/xf_compress.xo 
 	mkdir -p $(BUILD_DIR)
-	$(VPP) $(VPP_FLAGS) $(VPP_LINK_FLAGS) $(VPP_LINK_DIRS) -l \
+	$(VPP) $(VPP_FLAGS) $(VPP_LINK_FLAGS) $(VPP_LINK_DIRS) -l --profile_kernel data:all:all:all \
 	-o'$@' $(+)
 
 
@@ -210,7 +210,7 @@ $(XCLBIN_FILE): $(TEMP_DIR)/xf_compress.xo
 #                       host setup
 
 CXX := xcpp
-HOST_EXE := xil_snappy_8b
+HOST_EXE := xil_snappy
 
 CXXFLAGS +=-I$(CUR_DIR)/src/
 CXXFLAGS +=-I$(TB_DIR)/
@@ -272,7 +272,7 @@ cleanh:
 
 cleanall: cleanh cleank
 	rm -rf $(BUILD_DIR)
-	-$(RMDIR) _x_temp.*
+	-$(RMDIR) _x_temp.* *.csv *.run_summary
 	-$(RMDIR) $(XFLIB_DIR)/common/data/*.xe2xd* 
 
 clean: cleanh

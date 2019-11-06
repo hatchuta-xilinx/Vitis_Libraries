@@ -23,8 +23,12 @@
  *
  * This file is part of Vitis Data Compression Library.
  */
+#include "hls_stream.h"
 
-#include "common.h"
+#include <ap_int.h>
+#include <assert.h>
+#include <stdint.h>
+#include <stdio.h>
 
 namespace xf {
 namespace compression {
@@ -451,6 +455,25 @@ s2mm_simple:
     for (uint32_t i = 0; i < itrLim; i++) {
 #pragma HLS PIPELINE II = 1
         out[i] = inStream.read();
+    }
+}
+
+template <int DATAWIDTH>
+void s2mm(hls::stream<ap_uint<DATAWIDTH> >& inStream, ap_uint<DATAWIDTH>* out, hls::stream<uint32_t>& inStreamSize) {
+    const int c_byte_size = 8;
+    const int c_factor = DATAWIDTH / c_byte_size;
+
+    uint32_t outIdx = 0;
+    uint32_t size = 1;
+    uint32_t sizeIdx = 0;
+
+    for (int size = inStreamSize.read(); size != 0; size = inStreamSize.read()) {
+    mwr:
+        for (int i = 0; i < size; i++) {
+#pragma HLS PIPELINE II = 1
+            out[outIdx + i] = inStream.read();
+        }
+        outIdx += size;
     }
 }
 

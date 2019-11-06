@@ -200,14 +200,14 @@ $(TEMP_DIR)/xf_decompress.xo: $(DECOMPRESS_KERNEL_SRCS) $(HLS_SRC_DIR)
 # xclbin Binary creation
 $(XCLBIN_FILE): $(TEMP_DIR)/xf_decompress.xo
 	mkdir -p $(BUILD_DIR)
-	$(VPP) $(VPP_FLAGS) $(VPP_LINK_FLAGS) $(VPP_LINK_DIRS) -l \
+	$(VPP) $(VPP_FLAGS) $(VPP_LINK_FLAGS) $(VPP_LINK_DIRS) -l --profile_kernel data:all:all:all \
 	-o'$@' $(+)
 
 # ------------------------------------------------------------
 #                       host setup
 
 CXX := xcpp
-HOST_EXE := xil_lz4_8b
+HOST_EXE := xil_lz4
 #EXE_EXT = exe
 
 CXXFLAGS +=-I$(CUR_DIR)/src/
@@ -270,7 +270,7 @@ cleanh:
 
 cleanall: cleanh cleank
 	rm -rf $(BUILD_DIR)
-	-$(RMDIR) _x_temp* $(CUR_DIR)/reports
+	-$(RMDIR) _x_temp* *.csv *.run_summary $(CUR_DIR)/reports
 	-$(RMDIR) $(XFLIB_DIR)/common/data/*.orig* 
 
 clean: cleanh

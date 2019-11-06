@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="link" dir="">
+  <FileSets>
+    <FileSet Name="kernel_xilLz4Compress" Type="DesignSrcs">
+      <File Path="/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_build.sw_emu/link/int/xo/xilLz4Compress/xilLz4Compress/cpu_sources/lz4_compress_mm.cpp"/>
+      <Config/>
+    </FileSet>
+    <FileSet Name="kernel_xilLz4Packer" Type="DesignSrcs">
+      <File Path="/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_build.sw_emu/link/int/xo/xilLz4Packer/xilLz4Packer/cpu_sources/lz4_packer_mm.cpp"/>
+      <Config/>
+    </FileSet>
+  </FileSets>
+  <Runs/>
+</project>

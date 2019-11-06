@@ -25,9 +25,7 @@ void xilCompressTop(std::string& compress_mod, uint32_t block_size, std::string&
 
     xlz.m_bin_flow = 1;
 #ifdef VERBOSE
-    std::cout << "\n";
-    std::cout << "KT(MBps)\tSNAPPY_CR\t\tFile Size(MB)\t\tFile Name" << std::endl;
-    std::cout << "\n";
+    std::cout << std::fixed << std::setprecision(2) << "KT(MBps)\t\t:";
 #endif
 
     std::ifstream inFile(compress_mod.c_str(), std::ifstream::binary);
@@ -37,6 +35,14 @@ void xilCompressTop(std::string& compress_mod, uint32_t block_size, std::string&
     }
     uint64_t input_size = getFileSize(inFile);
     inFile.close();
+
+    const char* sizes[] = {"B", "kB", "MB", "GB", "TB"};
+    double len = input_size;
+    int order = 0;
+    while (len >= 1000) {
+        order++;
+        len = len / 1000;
+    }
 
     std::string lz_compress_in = compress_mod;
     std::string lz_compress_out = compress_mod;
@@ -60,11 +66,19 @@ void xilCompressTop(std::string& compress_mod, uint32_t block_size, std::string&
 
 #ifdef VERBOSE
     std::cout.precision(3);
-    std::cout << "\t\t" << (double)input_size / enbytes << "\t\t" << (double)input_size / 1000000 << "\t\t\t"
-              << lz_compress_in << std::endl;
+    std::cout << std::fixed << std::setprecision(2) << std::endl
+              << "LZ4_CR\t\t\t:" << (double)input_size / enbytes << std::endl
+              << std::fixed << std::setprecision(3) << "File Size(" << sizes[order] << ")\t\t:" << len << std::endl
+              << "File Name\t\t:" << lz_compress_in << std::endl;
     std::cout << "\n";
     std::cout << "Output Location: " << lz_compress_out.c_str() << std::endl;
-    std::cout << "Compressed file size: " << enbytes << std::endl;
+    len = enbytes;
+    order = 0;
+    while (len >= 1000) {
+        order++;
+        len = len / 1000;
+    }
+    std::cout << "Compressed file size(" << sizes[order] << ")\t\t:" << enbytes << std::endl;
 #endif
 
 #ifdef EVENT_PROFILE

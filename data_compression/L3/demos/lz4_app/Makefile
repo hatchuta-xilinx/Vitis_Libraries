@@ -212,13 +212,13 @@ $(TEMP_DIR)/xf_decompress.xo: $(DECOMPRESS_KERNEL_SRCS) $(HLS_SRC_DIR)
 # xclbin Binary creation
 $(XCLBIN_FILE_C): $(TEMP_DIR)/xf_compress.xo
 	mkdir -p $(BUILD_DIR)
-	$(VPP) $(VPP_FLAGS) $(VPP_LINK_FLAGS) $(VPP_LINK_DIRS)/Compress/ -l \
+	$(VPP) $(VPP_FLAGS) $(VPP_LINK_FLAGS) $(VPP_LINK_DIRS)/Compress/ -l --profile_kernel data:all:all:all \
 	--config $(CUR_DIR)/compress.ini \
 	-o'$@' $(+)
 
 $(XCLBIN_FILE_D): $(TEMP_DIR)/xf_decompress.xo
 	mkdir -p $(BUILD_DIR)
-	$(VPP) $(VPP_FLAGS) $(VPP_LINK_FLAGS) $(VPP_LINK_DIRS)/Decompress/ -l \
+	$(VPP) $(VPP_FLAGS) $(VPP_LINK_FLAGS) $(VPP_LINK_DIRS)/Decompress/ -l --profile_kernel data:all:all:all \
 	--config $(CUR_DIR)/decompress.ini \
 	-o'$@' $(+)
 
@@ -234,7 +234,7 @@ BIN_DIR_SUFFIX ?= _$(XDEVICE)
 OBJ_DIR = $(CUR_DIR)/$(OBJ_DIR_BASE)$(BIN_DIR_SUFFIX)
 
 CXX := xcpp
-EXE_NAME := xil_lz4_8b
+EXE_NAME := xil_lz4
 #EXE_EXT = exe
 
 CXXFLAGS +=-I$(CUR_DIR)/src/
@@ -313,8 +313,8 @@ cleanh:
 
 cleanall: cleanh cleank
 	rm -rf $(BUILD_DIR)
-	-$(RMDIR) _x_temp* $(CUR_DIR)/reports $(CUR_DIR)/obj_*
-	-$(RMDIR) $(XFLIB_DIR)/common/data/*.xe2xd* $(XFLIB_DIR)/common/data/*.orig* 
+	-$(RMDIR) _x_temp* $(CUR_DIR)/reports *.csv *.run_summary $(CUR_DIR)/obj_*
+	-$(RMDIR) ./*.xe2xd* ./*.orig* 
 
 clean: cleanh
 
@@ -325,7 +325,7 @@ clean: cleanh
 $(BUILD_DIR)/emconfig.json :
 		emconfigutil --platform $(XPLATFORM) --od $(BUILD_DIR)
 
-HOST_ARGS = -cx $(XCLBIN_FILE_C) -dx $(XCLBIN_FILE_D) -v $(XFLIB_DIR)/common/data/sample.txt
+HOST_ARGS = -cx $(XCLBIN_FILE_C) -dx $(XCLBIN_FILE_D) -l ./test_$(TARGET).list
 
 
 ifeq ($(TARGET),sw_emu)

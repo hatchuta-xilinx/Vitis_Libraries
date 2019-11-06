@@ -1,0 +1,226 @@
+INFO-FLOW: Workspace /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution opened at Wed Nov 06 18:48:56 IST 2019
+Execute     set_part xcku15p-ffva1156-2LV-e 
+Execute       ap_part_info -name xcku15p-ffva1156-2LV-e -data single -quiet 
+Command       ap_part_info done; 3.16 sec.
+Execute       ap_part_info -name xcku15p-ffva1156-2LV-e -data info 
+Execute       add_library xilinx/kintexuplus/kintexuplus:xcku15p:-ffva1156:-2LV-e 
+Execute         get_default_platform 
+Execute         license_isbetapart xcku15p 
+Command         license_isbetapart done; error code: 1; 
+Execute         open_platform DefaultPlatform 
+Execute         import_lib /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/kintexuplus/kintexuplus 
+Execute           source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/common/xilinx.lib 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/xilinx_interface.lib 
+Execute               source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/plb46.lib 
+Execute               source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/fsl.lib 
+Execute               source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/axi4.lib 
+Execute               source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/maxi.lib 
+Execute               source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/saxilite.lib 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/common/dsp48.lib 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/ip/dds_compiler.lib 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/ip/xfft.lib 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/ip/xfir.lib 
+Execute           source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/common/xilinx.hlp 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/common/target_info.tcl 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/xilinx_interface.hlp 
+Execute               source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/maxi.hlp 
+Execute               source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/saxilite.hlp 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/common/dsp48.hlp 
+Execute           source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/kintexuplus/dsp48e2.hlp 
+Execute           source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/common/xilinx.hlp 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/common/target_info.tcl 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/xilinx_interface.hlp 
+Execute               source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/maxi.hlp 
+Execute               source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/saxilite.hlp 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/common/dsp48.hlp 
+Execute         source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/kintexuplus/kintexuplus.gen 
+Execute           source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/common/xilinx.gen 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/plb46.gen 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/fsl.gen 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/axi4.gen 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/nativeAXI4.gen 
+Execute               source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/saxilite.gen 
+Execute               source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/maxi.gen 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/scripts/xilinxcoregen.gen 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/XilEDKCoreGen.gen 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/ip/dds_compiler.gen 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/ip/util.gen 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/ip/xfft.gen 
+Command             ap_source done; 0.11 sec.
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/ip/xfir.gen 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/common/dsp48.gen 
+Command           ap_source done; 0.17 sec.
+Command         ap_source done; 0.17 sec.
+Execute         ap_part_info -data single -name xcku15p-ffva1156-2LV-e 
+Execute         ap_part_info -name xcku15p-ffva1156-2LV-e -data resources 
+Execute         ap_part_info -name xcku15p-ffva1156-2LV-e -data info 
+Execute         ap_part_info -name xcku15p-ffva1156-2LV-e -data info 
+Execute         config_chip_info -quiet -resource {SLICE 65340} {LUT 522720} {FF 1045440} {DSP48E 1968} {BRAM 1968} {URAM 128} 
+Execute         ap_part_info -name xcku15p-ffva1156-2LV-e -data info 
+Execute         config_chip_info -quiet -speed medium 
+Command       add_library done; 0.27 sec.
+Execute       add_library xilinx/kintexuplus/kintexuplus_fpv7 
+Execute         get_default_platform 
+Execute         open_platform DefaultPlatform 
+Execute         import_lib /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/kintexuplus/kintexuplus_fpv7 
+Execute           source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/common/xilinx_fp.lib 
+Execute           source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/common/xilinx_fp.hlp 
+Execute             source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/common/xilinx.hlp 
+Execute               source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/common/target_info.tcl 
+Execute               source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/xilinx_interface.hlp 
+Execute                 source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/maxi.hlp 
+Execute                 source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/interface/saxilite.hlp 
+Execute               source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/common/dsp48.hlp 
+Execute         source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/kintexuplus/kintexuplus_fpv7.gen 
+Execute           source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/xilinx/common/xilinx_fp.gen 
+INFO: [HLS 200-10] Setting target device to 'xcku15p-ffva1156-2LV-e'
+Execute       ap_part_info -name xcku15p-ffva1156-2LV-e -data info 
+Execute       get_default_platform 
+Command     set_part done; 3.53 sec.
+Execute     create_clock -period 200MHz -name default 
+Execute       config_clock -quiet -name default -period 5 -unit ns -default=false 
+INFO: [SYN 201-201] Setting up clock 'default' with a period of 5ns.
+Execute     config_sdx -target xocc 
+Execute       send_msg_by_id INFO @200-435@%s%s 'config_sdx -target' config_export -vivado_optimization_level=0 
+INFO: [HLS 200-435] Setting 'config_sdx -target' configuration: config_export -vivado_optimization_level=0
+Execute       config_export -vivado_optimization_level=0 
+Execute         get_config_export -vivado_impl_strategy 
+Execute         get_config_export -vivado_phys_opt 
+Execute         send_msg_by_id INFO @200-435@%s%s 'config_export -vivado_optimization_level' config_export -vivado_phys_opt=none 
+INFO: [HLS 200-435] Setting 'config_export -vivado_optimization_level' configuration: config_export -vivado_phys_opt=none
+Execute         config_export -vivado_phys_opt=none 
+Execute       get_config_compile -pipeline_loops 
+Execute       send_msg_by_id INFO @200-435@%s%s 'config_sdx -target' config_compile -pipeline_loops=64 
+INFO: [HLS 200-435] Setting 'config_sdx -target' configuration: config_compile -pipeline_loops=64
+Execute       config_compile -pipeline_loops=64 
+INFO: [XFORM 203-1171] Pipeline the innermost loop with trip count more than 64 or its parent loop when its trip count is less than or equal 64.
+Execute       get_config_compile -name_max_length 
+Execute       send_msg_by_id INFO @200-435@%s%s 'config_sdx -target' config_compile -name_max_length=256 
+INFO: [HLS 200-435] Setting 'config_sdx -target' configuration: config_compile -name_max_length=256
+Execute       config_compile -name_max_length=256 
+INFO: [XFORM 203-1161] The maximum of name length is set into 256.
+Execute       get_config_schedule -enable_dsp_full_reg 
+Execute       send_msg_by_id INFO @200-435@%s%s 'config_sdx -target' config_schedule -enable_dsp_full_reg=1 
+INFO: [HLS 200-435] Setting 'config_sdx -target' configuration: config_schedule -enable_dsp_full_reg=1
+Execute       config_schedule -enable_dsp_full_reg=1 
+Execute       get_config_rtl -register_reset_num 
+Execute       send_msg_by_id INFO @200-435@%s%s 'config_sdx -target' config_rtl -register_reset_num=3 
+INFO: [HLS 200-435] Setting 'config_sdx -target' configuration: config_rtl -register_reset_num=3
+Execute       config_rtl -register_reset_num=3 
+Execute       get_config_rtl -module_auto_prefix 
+Execute       send_msg_by_id INFO @200-435@%s%s 'config_sdx -target' config_rtl -module_auto_prefix=1 
+INFO: [HLS 200-435] Setting 'config_sdx -target' configuration: config_rtl -module_auto_prefix=1
+Execute       config_rtl -module_auto_prefix=1 
+Execute       get_config_interface -m_axi_addr64 
+Execute       send_msg_by_id INFO @200-435@%s%s 'config_sdx -target' config_interface -m_axi_addr64=1 
+INFO: [HLS 200-435] Setting 'config_sdx -target' configuration: config_interface -m_axi_addr64=1
+Execute       config_interface -m_axi_addr64=1 
+Execute       send_msg_by_id INFO @200-435@%s%s 'config_sdx -target' set_clock_uncertainty 27% 
+INFO: [HLS 200-435] Setting 'config_sdx -target' configuration: set_clock_uncertainty 27%
+Execute       set_clock_uncertainty 27% 
+Execute         get_clock_period -default -name=default 
+Execute         config_clock -quiet -name default -uncertainty 1.35 -unit % 
+INFO: [SYN 201-201] Setting up clock 'default' with an uncertainty of 1.35ns.
+Execute     config_export -vivado_optimization_level 0 
+Execute       get_config_export -vivado_impl_strategy 
+Execute       get_config_export -vivado_phys_opt 
+Execute     config_dataflow -strict_mode warning 
+Execute     set_clock_uncertainty 27.000000% 
+Execute       get_clock_period -default -name=default 
+Execute       config_clock -quiet -name default -uncertainty 1.35 -unit % 
+INFO: [SYN 201-201] Setting up clock 'default' with an uncertainty of 1.35ns.
+Execute     config_interface -m_axi_addr64 
+Execute     config_compile -skip_transform 
+Execute     config_export -format ip_catalog -ipname xilLz4Compress 
+Execute     csynth_design 
+Execute       get_config_compile -dump_cfg 
+Execute       get_config_compile -effort 
+Execute       get_config_compile -enable_clang39 
+Execute       get_config_compile -g 
+Execute       get_config_compile -ng 
+Execute       get_config_compile -opt_fp 
+Execute       get_config_compile -skip_cdt 
+Execute       get_config_compile -skip_syncheck 
+Execute       get_config_compile -skip_transform 
+Execute       get_config_compile -keep_printf 
+Execute       elaborate -effort=medium -skip_syncheck=0 -keep_printf=0 -skip_cdt=0 -skip_transform=1 -ng=0 -g=0 -opt_fp=0 -from_csynth_design=1 
+Execute         get_config_schedule -relax_ii_for_timing 
+INFO: [SCHED 204-61] Option 'relax_ii_for_timing' is enabled, will increase II to preserve clock frequency constraints.
+Execute         get_config_schedule -suppress_dependence_error_break 
+INFO: [HLS 200-10] Analyzing design file '/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src/lz4_compress_mm.cpp' ... 
+INFO-FLOW: Compiling one TU...
+Execute         is_m_axi_addr64 
+INFO-FLOW: Handling /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src/lz4_compress_mm.cpp as C++
+Execute         ap_part_info -name xcku15p-ffva1156-2LV-e -data info 
+Execute         is_encrypted /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src/lz4_compress_mm.cpp 
+Execute         ap_part_info -name xcku15p-ffva1156-2LV-e -data info 
+INFO-FLOW: Running: GCC PP
+INFO-FLOW: Source preprocessing
+Execute         clang  -fno-limit-debug-info -gcc-toolchain "/proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/lnx64/tools/gcc" -hls  -fno-exceptions  -D__llvm__  -E "/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src/lz4_compress_mm.cpp"   -DPARALLEL_BLOCK=8 -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L1/include/hw -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/include -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src  -fno-math-errno -c -emit-llvm -O0  -mllvm -disable-llvm-optzns -fno-threadsafe-statics  -fno-use-cxa-atexit  -fno-threadsafe-statics -fno-use-cxa-atexit -D__CLANG_3_1__ -DAESL_SYN -D__SYNTHESIS__ -D__HLS_SYN__ -I "/proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/autopilot" -I "/proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/autopilot/ap_sysc" -include etc/autopilot_ssdm_op.h -D__DSP48E2__  -o "/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.pp.0.cpp" 
+INFO-FLOW: exec /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/lnx64/tools/clang/bin/clang -fno-limit-debug-info -gcc-toolchain /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/lnx64/tools/gcc -hls -fno-exceptions -D__llvm__ -E /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src/lz4_compress_mm.cpp -DPARALLEL_BLOCK=8 -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L1/include/hw -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/include -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src -fno-math-errno -c -emit-llvm -O0 -mllvm -disable-llvm-optzns -fno-threadsafe-statics -fno-use-cxa-atexit -fno-threadsafe-statics -fno-use-cxa-atexit -D__CLANG_3_1__ -DAESL_SYN -D__SYNTHESIS__ -D__HLS_SYN__ -I /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/autopilot -I /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/autopilot/ap_sysc -include etc/autopilot_ssdm_op.h -D__DSP48E2__ -o /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.pp.0.cpp
+Command         clang done; 2.02 sec.
+Execute         tidy_31 xilinx-xfmat-array-geometry /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.pp.0.cpp std=gnu++98 
+INFO-FLOW: exec /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/lnx64/tools/clang-3.9-csynth/bin/tidy-3.1 -header-filter=.* -checks=-*,xilinx-xfmat-array-geometry -quiet -fix /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.pp.0.cpp -- -std=gnu++98 -fhls -ferror-limit=0
+Command         tidy_31 done; 0.87 sec.
+INFO-FLOW: Syntax Checking before pre-processing...
+Execute         clang -syntaxcheck -src /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.pp.0.cpp  -fno-limit-debug-info -gcc-toolchain "/proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/lnx64/tools/gcc" -hls  -DPARALLEL_BLOCK=8 -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L1/include/hw -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/include -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src  -fno-math-errno -c -emit-llvm -O0  -mllvm -disable-llvm-optzns -fno-threadsafe-statics  -fno-use-cxa-atexit  -fno-threadsafe-statics -fno-use-cxa-atexit -D__CLANG_3_1__ -DAESL_SYN -D__SYNTHESIS__ -D__HLS_SYN__ -I "/proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/autopilot" -I "/proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/autopilot/ap_sysc" -include etc/autopilot_ssdm_op.h -D__DSP48E2__  "/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.pp.0.cpp"  -o "/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/useless.bc"  
+INFO-FLOW: exec /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/lnx64/tools/clang/bin/clang -fno-limit-debug-info -gcc-toolchain /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/lnx64/tools/gcc -hls -DPARALLEL_BLOCK=8 -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L1/include/hw -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/include -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src -fno-math-errno -c -emit-llvm -O0 -mllvm -disable-llvm-optzns -fno-threadsafe-statics -fno-use-cxa-atexit -fno-threadsafe-statics -fno-use-cxa-atexit -D__CLANG_3_1__ -DAESL_SYN -D__SYNTHESIS__ -D__HLS_SYN__ -I /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/autopilot -I /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/autopilot/ap_sysc -include etc/autopilot_ssdm_op.h -D__DSP48E2__ /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.pp.0.cpp -o /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/useless.bc
+Command         clang done; 2.21 sec.
+INFO-FLOW: Done: GCC PP time: 5.1 seconds per iteration
+Execute         source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/tps/tcl/tcllib1.11.1/yaml/huddle.tcl 
+Execute         source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/tps/tcl/tcllib1.11.1/yaml/json2huddle.tcl 
+Execute           source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/tps/tcl/tcllib1.11.1/try/try.tcl 
+Execute         list_core -type functional_unit 
+Execute         tidy_31 xilinx-systemc-detector /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.pp.0.cpp std=gnu++98 -directive=/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/.systemc_flag 
+INFO-FLOW: exec /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/lnx64/tools/clang-3.9-csynth/bin/tidy-3.1 -header-filter=.* -checks=-*,xilinx-systemc-detector -import-directive=/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/.systemc_flag -quiet -fix-errors /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.pp.0.cpp -- -std=gnu++98 -fhls -ferror-limit=0
+Command         tidy_31 done; 0.73 sec.
+INFO-FLOW: Running: tidy-3.1 CDT preprocess
+Execute         tidy_31 xilinx-directive2pragma /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.pp.0.cpp std=gnu++98 -directive=/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/all.directive.json 
+INFO-FLOW: exec /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/lnx64/tools/clang-3.9-csynth/bin/tidy-3.1 -header-filter=.* -checks=-*,xilinx-directive2pragma -import-directive=/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/all.directive.json -quiet -fix-errors /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.pp.0.cpp -- -std=gnu++98 -fhls -ferror-limit=0
+Command         tidy_31 done; 0.72 sec.
+Execute         get_config_dataflow -strict_mode 
+Execute         ap_eval exec -ignorestderr /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/lnx64/tools/clang-3.9-csynth/bin/xilinx-dataflow-lawyer -export-fixes=/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/xilinx-dataflow-lawyer.lz4_compress_mm.pp.0.cpp.diag.yml /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.pp.0.cpp -- -std=gnu++98 -fhls -ferror-limit=0 -fstrict-dataflow > /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/xilinx-dataflow-lawyer.lz4_compress_mm.pp.0.cpp.out.log 2> /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/xilinx-dataflow-lawyer.lz4_compress_mm.pp.0.cpp.err.log 
+Command         ap_eval done; 0.75 sec.
+Execute         source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/tps/tcl/tcllib1.11.1/yaml/yaml.tcl 
+Execute           source /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/tps/tcl/tcllib1.11.1/cmdline/cmdline.tcl 
+Execute         get_top
+Execute           get_top 
+Execute         get_files -fullpath
+Execute           get_files -fullpath 
+WARNING: [HLS 214-111] Streams will behave like static variables inside a dataflow region: /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L1/include/hw/lz4_compress.hpp:243:26
+WARNING: [HLS 214-111] Streams will behave like static variables inside a dataflow region: /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src/lz4_compress_mm.cpp:39:30
+WARNING: [HLS 214-114] Since the only kind of statements allowed in a dataflow region are variable declarations and function calls, the compiler may not be able to correctly handle the region: /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src/lz4_compress_mm.cpp:105:5
+Execute         send_msg_by_id WARNING @200-471@%s%s 3 /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src/lz4_compress_mm.cpp 
+WARNING: [HLS 200-471] Dataflow form checks found 3 issue(s) in file /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src/lz4_compress_mm.cpp
+Execute         tidy_31 -errorcheck xilinx-constantarray-param,xilinx-resource-pragma-transformer,xilinx-xfmat-array-geometry /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.pp.0.cpp std=gnu++98 
+Execute           ap_eval exec -ignorestderr /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/lnx64/tools/clang-3.9-csynth/bin/tidy-3.1 -export-fixes=/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/tidy-3.1.lz4_compress_mm.pp.0.cpp.diag.yml -header-filter=.* -checks=-*,xilinx-constantarray-param,xilinx-resource-pragma-transformer,xilinx-xfmat-array-geometry -quiet -fix-errors /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.pp.0.cpp -- -std=gnu++98 -fhls -ferror-limit=0 > /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/tidy-3.1.lz4_compress_mm.pp.0.cpp.out.log 2> /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/tidy-3.1.lz4_compress_mm.pp.0.cpp.err.log 
+Command           ap_eval done; 1.38 sec.
+Execute           ap_eval exec -ignorestderr /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/lnx64/tools/clang-3.9-csynth/bin/xilinx-legacy-rewriter /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.pp.0.cpp -- -std=gnu++98 -fhls -ferror-limit=0 > /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/xilinx-legacy-rewriter.lz4_compress_mm.pp.0.cpp.out.log 2> /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/xilinx-legacy-rewriter.lz4_compress_mm.pp.0.cpp.err.log 
+Command           ap_eval done; 0.7 sec.
+Command         tidy_31 done; 2.24 sec.
+INFO-FLOW: Done: tidy-3.1 CDT preprocess time: 4.7 seconds per iteration
+INFO-FLOW: Pragma Handling...
+Execute         tidy_31 xilinx-ssdm-intrinsics-arguments /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.pragma.1.cpp std=gnu++98 
+INFO-FLOW: exec /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/lnx64/tools/clang-3.9-csynth/bin/tidy-3.1 -header-filter=.* -checks=-*,xilinx-ssdm-intrinsics-arguments -quiet -fix-errors /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.pragma.1.cpp -- -std=gnu++98 -fhls -ferror-limit=0
+Command         tidy_31 done; 1.72 sec.
+Execute         ap_part_info -name xcku15p-ffva1156-2LV-e -data info 
+INFO-FLOW: Processing labels
+Execute         clang -src /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.pragma.2.cpp  -fno-limit-debug-info -gcc-toolchain /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/lnx64/tools/gcc -hls -hls-analyze-label -hls-analyze-pragma -fno-exceptions  -D__llvm__  -w  "/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.pragma.2.cpp"  -DPARALLEL_BLOCK=8 -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L1/include/hw -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/include -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src  -fno-math-errno -c -emit-llvm -O0  -mllvm -disable-llvm-optzns -fno-threadsafe-statics  -fno-use-cxa-atexit -DAESL_SYN -D__SYNTHESIS__ -D__HLS_SYN__ -I "/proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/autopilot" -I "/proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/autopilot/ap_sysc" -include etc/autopilot_ssdm_op.h -D__DSP48E2__ -g -o "/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.bc" 
+INFO-FLOW: exec /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/lnx64/tools/clang/bin/clang -fno-limit-debug-info -gcc-toolchain /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/lnx64/tools/gcc -hls -hls-analyze-label -hls-analyze-pragma -fno-exceptions -D__llvm__ -w /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.pragma.2.cpp -DPARALLEL_BLOCK=8 -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L1/include/hw -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/include -I/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L2/src -fno-math-errno -c -emit-llvm -O0 -mllvm -disable-llvm-optzns -fno-threadsafe-statics -fno-use-cxa-atexit -DAESL_SYN -D__SYNTHESIS__ -D__HLS_SYN__ -I /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/autopilot -I /proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/common/technology/autopilot/ap_sysc -include etc/autopilot_ssdm_op.h -D__DSP48E2__ -g -o /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.bc
+Command         clang done; 2.31 sec.
+INFO-FLOW: Linking Debug ...
+Execute         llvm-ld /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/lz4_compress_mm.g.bc -hls-opt -except-internalize xilLz4Compress -L/proj/xbuilds/2019.1_0524_1430/installs/lin64/Vivado/2019.1/lnx64/lib -lhlsm -lhlsmc++ -o /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/a.g 
+Command         llvm-ld done; 1.04 sec.
+INFO: [HLS 200-111] Finished Linking Time (s): cpu = 00:00:15 ; elapsed = 00:00:20 . Memory (MB): peak = 926.500 ; gain = 128.000 ; free physical = 76322 ; free virtual = 207597
+INFO: [HLS 200-111] Finished Checking Pragmas Time (s): cpu = 00:00:15 ; elapsed = 00:00:20 . Memory (MB): peak = 926.500 ; gain = 128.000 ; free physical = 76322 ; free virtual = 207597
+Execute         get_config_sdx -target 
+Execute         get_config_rtl -kernel_profile 
+Execute         get_config_rtl -stall_sig_gen 
+Execute         get_config_rtl -profile 
+INFO-FLOW: Generating Kernel XML ...
+Execute         transform -hls -top=xilLz4Compress -xcl-target=hls -xcl-xmlinfo=/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/../../../kernel.xml -xcl-profiletype=none -mem2reg -hlskernelxml /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/a.g.bc -o /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/a.cl.xml.bc -f 
+INFO-FLOW: DBG:CMD: Copying raw kernel.xml: /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/../../../kernel.xml -> /wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress/xilLz4Compress/solution/.autopilot/db/kernel.internal.xml
+Command       elaborate done; 15.95 sec.
+Command     csynth_design done; 15.96 sec.
+Execute     close_project 
+Execute     cleanup_all 

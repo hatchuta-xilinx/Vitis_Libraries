@@ -212,7 +212,7 @@ $(TEMP_DIR)/xf_decompress_datamover.xo: $(DECOMP_DATAMOVER_KERNEL_SRCS) $(HLS_SR
 # xclbin Binary creation
 $(XCLBIN_FILE): $(TEMP_DIR)/xf_decompress_streaming.xo $(TEMP_DIR)/xf_decompress_datamover.xo
 	mkdir -p $(BUILD_DIR)
-	$(VPP) $(VPP_FLAGS) $(VPP_LINK_FLAGS) $(VPP_LINK_DIRS)/Decompress/ -l \
+	$(VPP) $(VPP_FLAGS) $(VPP_LINK_FLAGS) $(VPP_LINK_DIRS)/Decompress/ -l --profile_kernel data:all:all:all \
 	--config $(CUR_DIR)/decompress.ini \
 	-o'$@' $(+)
 
@@ -283,7 +283,7 @@ cleanh:
 
 cleanall: cleanh cleank
 	rm -rf $(BUILD_DIR)
-	-$(RMDIR) _x_temp* $(CUR_DIR)/reports
+	-$(RMDIR) _x_temp* *.csv *.run_summary $(CUR_DIR)/reports
 	-$(RMDIR) $(XFLIB_DIR)/common/data/*.xe2xd* 
 
 clean: cleanh

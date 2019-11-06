@@ -192,8 +192,8 @@ XO_FILES_C = $(TEMP_DIR)/xf_compress_lz77.xo \
 XO_FILES_D = $(TEMP_DIR)/xf_zlib_decompress.xo
 
 COMPRESS_KERNEL_SRCS = $(KSRC_DIR)/zlib_lz77_compress_mm.cpp
-HUFFMAN_KERNEL_SRCS = $(KSRC_DIR)/huffman_mm.cpp
-TREEGEN_KERNEL_SRCS = $(KSRC_DIR)/treegen_mm.cpp
+HUFFMAN_KERNEL_SRCS = $(KSRC_DIR)/zlib_huffman_enc_mm.cpp
+TREEGEN_KERNEL_SRCS = $(KSRC_DIR)/zlib_treegen_mm.cpp
 DECOMPRESS_KERNEL_SRCS = $(KSRC_DIR)/zlib_decompress_mm.cpp
 
 COMPRESS_KERNEL_NAME = xilLz77Compress
@@ -235,7 +235,7 @@ $(TEMP_DIR)/xf_zlib_decompress.xo: $(DECOMPRESS_KERNEL_SRCS) $(HLS_SRC_DIR)
 # xclbin Binary creation
 $(XCLBIN_FILE): $(XO_FILES_C) $(XO_FILES_D)
 	mkdir -p $(BUILD_DIR)
-	$(VPP) $(VPP_FLAGS) $(VPP_LINK_FLAGS) $(VPP_LINK_DIRS) -l -o'$@' $(+)
+	$(VPP) $(VPP_FLAGS) $(VPP_LINK_FLAGS) $(VPP_LINK_DIRS) -l --profile_kernel data:all:all:all -o'$@' $(+)
 
 
 # ------------------------------------------------------------
@@ -308,7 +308,7 @@ cleanh:
 
 cleanall: cleanh cleank
 	rm -rf $(BUILD_DIR)
-	-$(RMDIR) $(TEMP_DIR) $(CUR_DIR)/reports *.csv $(CUR_DIR)/*.raw
+	-$(RMDIR) $(TEMP_DIR) $(CUR_DIR)/reports *.csv *.run_summary $(CUR_DIR)/*.raw
 	-$(RMDIR) $(XFLIB_DIR)/common/data/*.xe2xd* $(XFLIB_DIR)/common/data/*.orig*
 
 clean: cleanh

@@ -1,0 +1,9 @@
+Wed Nov  6 18:49:52 2019: Server was asked to start on port: '39097'
+Wed Nov  6 18:49:52 2019: Attempting to start server on port '39097'
+Wed Nov  6 18:49:52 2019: XRC main fifo: created main fifo '/tmp/xrcmain39097', fd read = 13
+Wed Nov  6 18:49:52 2019: Running Rule Check Server
+Wed Nov  6 18:49:52 2019: Version 1.4.0
+Wed Nov  6 18:49:53 2019: Rule Check Server: Accepted socket connection from client
+Wed Nov  6 18:49:53 2019: EXCHANGE_TOKEN received, server token: 0f17c606-aa84-44b6-84cb-80108bfd861c, passed token: 0f17c606-aa84-44b6-84cb-80108bfd861c
+Wed Nov  6 18:49:53 2019: SESSION_MGR: creating session with session uuid: 'e06cd985-7fbd-4b83-82f5-a44b4a6741c8' and name 'xocc_link_compress'
+Wed Nov  6 18:50:07 2019: SESSION_MGR: closing session for UUID 'e06cd985-7fbd-4b83-82f5-a44b4a6741c8' with name 'xocc_link_compress'

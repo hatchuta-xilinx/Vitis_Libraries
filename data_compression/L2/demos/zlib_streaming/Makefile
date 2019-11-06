@@ -182,27 +182,35 @@ VPP_LINK_DIRS = --temp_dir $(TEMP_DIR)/_build.$(TARGET)\
 
 XCLBIN_FILE_D = $(BUILD_DIR)/xclbin_$(XDEVICE)_$(TARGET)/decompress_k2k.xclbin
 
-XO_FILES = $(TEMP_DIR)/xf_zlib_datamover.xo \
+XO_FILES = $(TEMP_DIR)/xf_zlib_datareader.xo \
+		   $(TEMP_DIR)/xf_zlib_datawriter.xo \
 		   $(TEMP_DIR)/xf_zlib_decompress.xo
 
-DATAMOVER_KERNEL_SRCS = $(KSRC_DIR)/zlib_dm.cpp
-DECOMPRESS_KERNEL_SRCS = $(KSRC_DIR)/zlib_decompress_stream_k2k.cpp
+DATAREADER_KERNEL_SRCS = $(TB_DIR)/zlib_dm_rd.cpp
+DATAWRITER_KERNEL_SRCS = $(TB_DIR)/zlib_dm_wr.cpp
+DECOMPRESS_KERNEL_SRCS = $(KSRC_DIR)/zlib_decompress_stream.cpp
 
-DATAMOVER_KERNEL_NAME = xilZlibDm
-DECOMPRESS_KERNEL_NAME = xilDecompressStreamk2k
+DATAREADER_KERNEL_NAME = xilZlibDmReader
+DATAWRITER_KERNEL_NAME = xilZlibDmWriter
+DECOMPRESS_KERNEL_NAME = xilDecompressStream
 
-KERNELS = $(DATAMOVER_KERNEL_NAME)
+KERNELS = $(DATAREADER_KERNEL_NAME)
+KERNELS += $(DATAWRITER_KERNEL_NAME)
 KERNELS += $(DECOMPRESS_KERNEL_NAME)
 
 # ------------------------------------------------------------
 #                      kernel rules
 
 # Building kernel
-$(TEMP_DIR)/xf_zlib_datamover.xo: $(DATAMOVER_KERNEL_SRCS) $(HLS_SRC_DIR)
+$(TEMP_DIR)/xf_zlib_datareader.xo: $(DATAREADER_KERNEL_SRCS) $(HLS_SRC_DIR)
 	@echo -e "----\nCompiling compression kernel $*..."
 	mkdir -p $(TEMP_DIR)
-	$(VPP) $(VPP_FLAGS) $(VPP_DIRS) -c -k $(DATAMOVER_KERNEL_NAME) -I'$(<D)' -o'$@' '$<'
+	$(VPP) $(VPP_FLAGS) $(VPP_DIRS) -c -k $(DATAREADER_KERNEL_NAME) -I'$(<D)' -o'$@' '$<'
 
+$(TEMP_DIR)/xf_zlib_datawriter.xo: $(DATAWRITER_KERNEL_SRCS) $(HLS_SRC_DIR)
+	@echo -e "----\nCompiling compression kernel $*..."
+	mkdir -p $(TEMP_DIR)
+	$(VPP) $(VPP_FLAGS) $(VPP_DIRS) -c -k $(DATAWRITER_KERNEL_NAME) -I'$(<D)' -o'$@' '$<'
 
 $(TEMP_DIR)/xf_zlib_decompress.xo: $(DECOMPRESS_KERNEL_SRCS) $(HLS_SRC_DIR)
 	@echo -e "----\nCompiling decompression kernel $*..."
@@ -213,15 +221,14 @@ $(TEMP_DIR)/xf_zlib_decompress.xo: $(DECOMPRESS_KERNEL_SRCS) $(HLS_SRC_DIR)
 # xclbin Binary creation
 $(XCLBIN_FILE_D): $(XO_FILES)
 	mkdir -p $(BUILD_DIR)
-	$(VPP) $(VPP_FLAGS) $(VPP_LINK_FLAGS) $(VPP_LINK_DIRS)/Decompress/ -l -o'$@' $(+)
+	$(VPP) $(VPP_FLAGS) $(VPP_LINK_FLAGS) $(VPP_LINK_DIRS)/Decompress/ -l --profile_kernel data:all:all:all -o'$@' $(+)
 
 
 # ------------------------------------------------------------
 #                       host setup
 
 CXX := xcpp
-HOST_EXE := xil_zlib_stream_k2k
-#EXE_EXT = exe
+HOST_EXE := zlib_stream
 
 CXXFLAGS +=-I$(CUR_DIR)/src/
 CXXFLAGS +=-I$(XFLIB_DIR)/L2/include/
@@ -234,7 +241,7 @@ CXXFLAGS +=-I$(XFLIB_DIR)/common/thirdParty/xxhash/
 
 #Host and Common sources
 SRCS += $(SRC_DIR)/src/host.cpp
-SRCS += $(TB_DIR)/zlib_stream_k2k.cpp
+SRCS += $(TB_DIR)/zlib_stream.cpp
 SRCS += $(XFLIB_DIR)/common/libs/xcl2/xcl2.cpp
 SRCS += $(XFLIB_DIR)/common/libs/cmdparser/cmdlineparser.cpp
 SRCS += $(XFLIB_DIR)/common/libs/logger/logger.cpp
@@ -286,8 +293,8 @@ cleanh:
 
 cleanall: cleanh cleank
 	rm -rf $(BUILD_DIR)
-	-$(RMDIR) $(TEMP_DIR) $(CUR_DIR)/reports *.csv $(CUR_DIR)/*.raw
-	-$(RMDIR) $(XFLIB_DIR)/common/data/*.xe2xd*
+	-$(RMDIR) $(TEMP_DIR) $(CUR_DIR)/reports *.run_summary *.csv $(CUR_DIR)/*.raw
+	-$(RMDIR) $(XFLIB_DIR)/common/data/*.xe2xd* $(XFLIB_DIR)/common/data/*.raw
 
 clean: cleanh
 

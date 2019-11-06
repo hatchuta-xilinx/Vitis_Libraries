@@ -208,8 +208,6 @@ setup: | check_part
 
 DECOMPRESS_OUT_DIR:=./build_decompress_ip
 
-decompress_srcs+=../../include/hw/lz4_decompress_core.hpp
-
 decompress_script=./run_decompress_hls.tcl
 
 decompress_ip_out=$(DECOMPRESS_OUT_DIR)/lz4_decompress_ip/lz4_decompress_stream/impl/ip/component.xml

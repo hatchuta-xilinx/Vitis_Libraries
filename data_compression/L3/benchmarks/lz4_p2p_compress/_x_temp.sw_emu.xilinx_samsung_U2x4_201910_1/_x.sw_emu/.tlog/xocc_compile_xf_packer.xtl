@@ -1,0 +1,147 @@
+<ENTRY>
+{
+    "EntryID": "1",
+    "Type": "CmdStep",
+    "DateTimestamp": "2019-Nov-06 18:49:20.880000",
+    "TimestampMillis": "67760880",
+    "Payload": {
+        "CmdStepID": "6a22bb60-7b5a-4c30-a4a1-1de97fce14c9",
+        "Command": "xocc",
+        "LogFile": "$LOGDIR\/..\/xf_packer\/xf_packer.steps.log",
+        "CommandLine": "\/proj\/xbuilds\/2019.1_0524_1430\/installs\/lin64\/SDx\/2019.1\/bin\/unwrapped\/lnx64.o\/xocc  --xp \"vivado_prop:run.__KERNEL__.{STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS}={-directive sdx_optimization_effort_high}\" --xp \"misc:report=type report_timing_summary name impl_report_timing_summary_route_design_summary steps {route_design} runs {impl_1} options {-max_paths 10}\" --xp \"misc:report=type report_timing_summary name impl_report_timing_summary_post_route_phys_opt_design_summary steps {post_route_phys_opt_design} runs {impl_1} options {-max_paths 10}\" -I\/wrk\/xhdhdnobkup1\/hatchuta\/git_repo\/compression\/samsung_p2p\/compression_p2p\/public_test\/Vitis_Libraries\/data_compression\/L1\/include\/hw -I\/wrk\/xhdhdnobkup1\/hatchuta\/git_repo\/compression\/samsung_p2p\/compression_p2p\/public_test\/Vitis_Libraries\/data_compression\/L2\/src\/ -I\/wrk\/xhdhdnobkup1\/hatchuta\/git_repo\/compression\/samsung_p2p\/compression_p2p\/public_test\/Vitis_Libraries\/data_compression\/L2\/include\/ --kernel_frequency=200 -t sw_emu --platform \/proj\/xresults\/ipsgrp\/memory\/hemanthk\/projects\/samsung_ku15p\/deliverble_packages\/oct_1_releases\/U.2_Debug_Shell_internal_v027_1_oct_2019\/xilinx_samsung_U2x4_201910_1\/xilinx_samsung_U2x4_201910_1.xpfm --save-temps -DPARALLEL_BLOCK=8 --temp_dir \/wrk\/xhdhdnobkup1\/hatchuta\/git_repo\/compression\/samsung_p2p\/compression_p2p\/public_test\/Vitis_Libraries\/data_compression\/L3\/benchmarks\/lz4_p2p_compress\/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1\/_x.sw_emu --report_dir \/wrk\/xhdhdnobkup1\/hatchuta\/git_repo\/compression\/samsung_p2p\/compression_p2p\/public_test\/Vitis_Libraries\/data_compression\/L3\/benchmarks\/lz4_p2p_compress\/reports\/_x.sw_emu -c -k xilLz4Packer -I\/wrk\/xhdhdnobkup1\/hatchuta\/git_repo\/compression\/samsung_p2p\/compression_p2p\/public_test\/Vitis_Libraries\/data_compression\/L2\/src\/ -o\/wrk\/xhdhdnobkup1\/hatchuta\/git_repo\/compression\/samsung_p2p\/compression_p2p\/public_test\/Vitis_Libraries\/data_compression\/L3\/benchmarks\/lz4_p2p_compress\/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1\/xf_packer.xo \/wrk\/xhdhdnobkup1\/hatchuta\/git_repo\/compression\/samsung_p2p\/compression_p2p\/public_test\/Vitis_Libraries\/data_compression\/L2\/src\/\/lz4_packer_mm.cpp ",
+        "OptionArgs": [
+            "-I\/wrk\/xhdhdnobkup1\/hatchuta\/git_repo\/compression\/samsung_p2p\/compression_p2p\/public_test\/Vitis_Libraries\/data_compression\/L1\/include\/hw",
+            "-I\/wrk\/xhdhdnobkup1\/hatchuta\/git_repo\/compression\/samsung_p2p\/compression_p2p\/public_test\/Vitis_Libraries\/data_compression\/L2\/src\/",
+            "-I\/wrk\/xhdhdnobkup1\/hatchuta\/git_repo\/compression\/samsung_p2p\/compression_p2p\/public_test\/Vitis_Libraries\/data_compression\/L2\/include\/",
+            "--kernel_frequency=200",
+            "-t",
+            "sw_emu",
+            "--platform",
+            "\/proj\/xresults\/ipsgrp\/memory\/hemanthk\/projects\/samsung_ku15p\/deliverble_packages\/oct_1_releases\/U.2_Debug_Shell_internal_v027_1_oct_2019\/xilinx_samsung_U2x4_201910_1\/xilinx_samsung_U2x4_201910_1.xpfm",
+            "--save-temps",
+            "-DPARALLEL_BLOCK=8",
+            "--temp_dir",
+            "\/wrk\/xhdhdnobkup1\/hatchuta\/git_repo\/compression\/samsung_p2p\/compression_p2p\/public_test\/Vitis_Libraries\/data_compression\/L3\/benchmarks\/lz4_p2p_compress\/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1\/_x.sw_emu",
+            "--report_dir",
+            "\/wrk\/xhdhdnobkup1\/hatchuta\/git_repo\/compression\/samsung_p2p\/compression_p2p\/public_test\/Vitis_Libraries\/data_compression\/L3\/benchmarks\/lz4_p2p_compress\/reports\/_x.sw_emu",
+            "-c",
+            "-k",
+            "xilLz4Packer",
+            "-I\/wrk\/xhdhdnobkup1\/hatchuta\/git_repo\/compression\/samsung_p2p\/compression_p2p\/public_test\/Vitis_Libraries\/data_compression\/L2\/src\/",
+            "-o\/wrk\/xhdhdnobkup1\/hatchuta\/git_repo\/compression\/samsung_p2p\/compression_p2p\/public_test\/Vitis_Libraries\/data_compression\/L3\/benchmarks\/lz4_p2p_compress\/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1\/xf_packer.xo",
+            "\/wrk\/xhdhdnobkup1\/hatchuta\/git_repo\/compression\/samsung_p2p\/compression_p2p\/public_test\/Vitis_Libraries\/data_compression\/L2\/src\/\/lz4_packer_mm.cpp"
+        ]
+    }
+}
+</ENTRY>
+<ENTRY>
+{
+    "EntryID": "2",
+    "Type": "Status",
+    "DateTimestamp": "2019-Nov-06 18:49:20.881000",
+    "TimestampMillis": "67760881",
+    "Payload": {
+        "CmdStepID": "6a22bb60-7b5a-4c30-a4a1-1de97fce14c9",
+        "Status": "Start"
+    }
+}
+</ENTRY>
+<ENTRY>
+{
+    "EntryID": "3",
+    "Type": "FlowMetaData",
+    "DateTimestamp": "2019-Nov-06 18:49:26.406000",
+    "TimestampMillis": "67766406",
+    "Payload": {
+        "HardwarePlatform": "xilinx_samsung_U2x4_201910_1.xpfm",
+        "HardwareDSA": "xilinx_samsung_U2x4_201910_1.dsa",
+        "PlatformDirectory": "\/proj\/xresults\/ipsgrp\/memory\/hemanthk\/projects\/samsung_ku15p\/deliverble_packages\/oct_1_releases\/U.2_Debug_Shell_internal_v027_1_oct_2019\/xilinx_samsung_U2x4_201910_1",
+        "Runtime": "OpenCL",
+        "SystemConfiguration": "Linux",
+        "BinaryContainer": "",
+        "BuildFlow": "COMPILE",
+        "Target": "SW_EMU",
+        "Kernels": [
+            {
+                "KernelName": "xilLz4Packer",
+                "KernelObj": "$LOGDIR\/..\/..\/xf_packer.xo",
+                "KernelSrcs": [
+                    "$LOGDIR\/..\/..\/..\/..\/..\/..\/L2\/src\/lz4_packer_mm.cpp"
+                ]
+            }
+        ]
+    }
+}
+</ENTRY>
+<ENTRY>
+{
+    "EntryID": "4",
+    "Type": "SubCmdStep",
+    "DateTimestamp": "2019-Nov-06 18:49:26.417000",
+    "TimestampMillis": "67766417",
+    "Payload": {
+        "CmdStepID": "9294b9af-a3dc-45d5-9ff9-8e7582f78d34",
+        "Command": "vivado_hls",
+        "LogFile": "$LOGDIR\/..\/xf_packer\/xilLz4Packer\/vivado_hls.log",
+        "TransactionLogFile": "",
+        "CommandLine": "vivado_hls -f \/wrk\/xhdhdnobkup1\/hatchuta\/git_repo\/compression\/samsung_p2p\/compression_p2p\/public_test\/Vitis_Libraries\/data_compression\/L3\/benchmarks\/lz4_p2p_compress\/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1\/_x.sw_emu\/xf_packer\/xilLz4Packer\/xilLz4Packer.tcl -messageDb vivado_hls.pb",
+        "OptionArgs": [
+            "vivado_hls",
+            "-f",
+            "\/wrk\/xhdhdnobkup1\/hatchuta\/git_repo\/compression\/samsung_p2p\/compression_p2p\/public_test\/Vitis_Libraries\/data_compression\/L3\/benchmarks\/lz4_p2p_compress\/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1\/_x.sw_emu\/xf_packer\/xilLz4Packer\/xilLz4Packer.tcl",
+            "-messageDb",
+            "vivado_hls.pb"
+        ]
+    }
+}
+</ENTRY>
+<ENTRY>
+{
+    "EntryID": "5",
+    "Type": "Status",
+    "DateTimestamp": "2019-Nov-06 18:49:26.418000",
+    "TimestampMillis": "67766418",
+    "Payload": {
+        "CmdStepID": "9294b9af-a3dc-45d5-9ff9-8e7582f78d34",
+        "Status": "Start"
+    }
+}
+</ENTRY>
+<ENTRY>
+{
+    "EntryID": "6",
+    "Type": "Status",
+    "DateTimestamp": "2019-Nov-06 18:49:47.347000",
+    "TimestampMillis": "67787347",
+    "Payload": {
+        "CmdStepID": "9294b9af-a3dc-45d5-9ff9-8e7582f78d34",
+        "Status": "Passed"
+    }
+}
+</ENTRY>
+<ENTRY>
+{
+    "EntryID": "7",
+    "Type": "Report",
+    "DateTimestamp": "2019-Nov-06 18:49:47.469000",
+    "TimestampMillis": "67787469",
+    "Payload": {
+        "File": "$LOGDIR\/..\/..\/..\/reports\/_x.sw_emu\/xf_packer\/xocc_compile_xf_packer_guidance.html",
+        "Type": "HTML",
+        "ReportType": "GLOBAL_RULECHECK_GUIDANCE",
+        "KernelName": ""
+    }
+}
+</ENTRY>
+<ENTRY>
+{
+    "EntryID": "8",
+    "Type": "Status",
+    "DateTimestamp": "2019-Nov-06 18:49:47.527000",
+    "TimestampMillis": "67787527",
+    "Payload": {
+        "CmdStepID": "6a22bb60-7b5a-4c30-a4a1-1de97fce14c9",
+        "Status": "Passed"
+    }
+}
+</ENTRY>

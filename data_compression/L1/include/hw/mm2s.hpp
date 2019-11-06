@@ -23,11 +23,18 @@
  *
  * This file is part of Vitis Data Compression Library.
  */
+#include "hls_stream.h"
 
-#include "common.h"
-#include <string.h>
+#include <ap_int.h>
+#include <assert.h>
+#include <stdint.h>
+#include <stdio.h>
+
 namespace xf {
 namespace compression {
+
+const int kGMemDWidth = 512;
+typedef ap_uint<kGMemDWidth> uintMemWidth_t;
 
 const int c_lTreeSize = 1024;
 const int c_dTreeSize = 64;
@@ -176,15 +183,43 @@ void mm2sNbFreq(const ap_uint<DATAWIDTH>* in,
     uint32_t lcl_maxcode[PARALLEL_BLOCK * c_maxCodeSize];
 
     for (uint32_t blk = 0; blk < n_blocks; blk++) {
-        memcpy(lcl_ltree_codes[blk], &dyn_ltree_codes[blk * c_lTreeSize], c_lTreeSize * sizeof(uint32_t));
-        memcpy(lcl_ltree_blen[blk], &dyn_ltree_blen[blk * c_lTreeSize], c_lTreeSize * sizeof(uint32_t));
-        memcpy(lcl_dtree_codes[blk], &dyn_dtree_codes[blk * c_dTreeSize], c_dTreeSize * sizeof(uint32_t));
-        memcpy(lcl_dtree_blen[blk], &dyn_dtree_blen[blk * c_dTreeSize], c_dTreeSize * sizeof(uint32_t));
-        memcpy(lcl_bltree_codes[blk], &dyn_bltree_codes[blk * c_bLTreeSize], c_bLTreeSize * sizeof(uint32_t));
-        memcpy(lcl_bltree_blen[blk], &dyn_bltree_blen[blk * c_bLTreeSize], c_bLTreeSize * sizeof(uint32_t));
+    cpy_ltree_codes:
+        for (uint32_t ci = 0; ci < c_lTreeSize; ++ci) {
+#pragma HLS PIPELINE II = 1
+            lcl_ltree_codes[blk][ci] = dyn_ltree_codes[blk * c_lTreeSize + ci];
+        }
+    cpy_ltree_blen:
+        for (uint32_t ci = 0; ci < c_lTreeSize; ++ci) {
+#pragma HLS PIPELINE II = 1
+            lcl_ltree_blen[blk][ci] = dyn_ltree_blen[blk * c_lTreeSize + ci];
+        }
+    cpy_dtree_codes:
+        for (uint32_t ci = 0; ci < c_dTreeSize; ++ci) {
+#pragma HLS PIPELINE II = 1
+            lcl_dtree_codes[blk][ci] = dyn_dtree_codes[blk * c_dTreeSize + ci];
+        }
+    cpy_dtree_blen:
+        for (uint32_t ci = 0; ci < c_dTreeSize; ++ci) {
+#pragma HLS PIPELINE II = 1
+            lcl_dtree_blen[blk][ci] = dyn_dtree_blen[blk * c_dTreeSize + ci];
+        }
+    cpy_bltree_codes:
+        for (uint32_t ci = 0; ci < c_bLTreeSize; ++ci) {
+#pragma HLS PIPELINE II = 1
+            lcl_bltree_codes[blk][ci] = dyn_bltree_codes[blk * c_bLTreeSize + ci];
+        }
+    cpy_bltree_blen:
+        for (uint32_t ci = 0; ci < c_bLTreeSize; ++ci) {
+#pragma HLS PIPELINE II = 1
+            lcl_bltree_blen[blk][ci] = dyn_bltree_blen[blk * c_bLTreeSize + ci];
+        }
     }
 
-    memcpy(lcl_maxcode, &dyn_maxcodes[0], PARALLEL_BLOCK * c_maxCodeSize * sizeof(uint32_t));
+cpy_maxcodes:
+    for (uint32_t ci = 0; ci < PARALLEL_BLOCK * c_maxCodeSize; ++ci) {
+#pragma HLS PIPELINE II = 1
+        lcl_maxcode[ci] = dyn_maxcodes[ci];
+    }
 
     for (uint32_t blk = 0; blk < n_blocks; blk++) {
         stream_maxcode[blk] << lcl_maxcode[blk * 3];
@@ -409,6 +444,90 @@ mm2s_simple:
 #pragma HLS PIPELINE II = 1
         outstream << in[i];
     }
+}
+
+template <int DATAWIDTH, int BURST_SIZE>
+void mm2s(const uintMemWidth_t* in,
+          uintMemWidth_t* head_prev_blk,
+          uintMemWidth_t* orig_input_data,
+          hls::stream<ap_uint<DATAWIDTH> >& outStream,
+          hls::stream<uint32_t>& outStreamSize,
+          uint32_t* compressd_size,
+          uint32_t* in_block_size,
+          uint32_t no_blocks,
+          uint32_t block_size_in_kb,
+          uint32_t head_res_size,
+          uint32_t offset) {
+    const int c_byte_size = 8;
+    const int c_word_size = DATAWIDTH / c_byte_size;
+    ap_uint<DATAWIDTH> buffer[BURST_SIZE];
+#pragma HLS RESOURCE variable = buffer core = RAM_2P_LUTRAM
+
+    uint32_t offset_gmem = offset ? offset / 64 : 0;
+
+    // Handle header or residue here
+    uint32_t block_stride = block_size_in_kb * 1024 / 64;
+
+    uint32_t blkCompSize = 0;
+    uint32_t origSize = 0;
+    uint32_t sizeInWord = 0;
+    uint32_t byteSize = 0;
+    // Run over number of blocks
+    for (int bIdx = 0; bIdx < no_blocks + 1; bIdx++) {
+        if (bIdx == 0) {
+            sizeInWord = head_res_size ? ((head_res_size - 1) / c_word_size + 1) : 0;
+            byteSize = head_res_size;
+        } else {
+            blkCompSize = compressd_size[bIdx - 1];
+            origSize = in_block_size[bIdx - 1];
+            // Put compress block & input block
+            // into streams for next block
+            sizeInWord = (blkCompSize - 1) / c_word_size + 1;
+            byteSize = blkCompSize;
+        }
+
+        // Send size in bytes
+        outStreamSize << byteSize;
+
+        // printf("[ %s ]blkCompSize %d origSize %d sizeInWord_512 %d offset %d head_res_size %d\n", __FUNCTION__,
+        // blkCompSize, origSize, sizeInWord, offset, head_res_size);
+
+        // Copy data from global memory to local
+        // Put it into stream
+        for (uint32_t i = 0; i < sizeInWord; i += BURST_SIZE) {
+            uint32_t chunk_size = BURST_SIZE;
+
+            if (i + BURST_SIZE > sizeInWord) chunk_size = sizeInWord - i;
+
+            if (bIdx == 0) {
+            memrd1:
+                for (uint32_t j = 0; j < chunk_size; j++) {
+#pragma HLS PIPELINE II = 1
+                    buffer[j] = head_prev_blk[(offset_gmem + i) + j];
+                }
+            } else if (blkCompSize == origSize) {
+            memrd2:
+                for (uint32_t j = 0; j < chunk_size; j++) {
+#pragma HLS PIPELINE II = 1
+                    buffer[j] = orig_input_data[(block_stride * (bIdx - 1) + i) + j];
+                }
+            } else {
+            memrd3:
+                for (uint32_t j = 0; j < chunk_size; j++) {
+#pragma HLS PIPELINE II = 1
+                    buffer[j] = in[(block_stride * (bIdx - 1) + i) + j];
+                }
+            }
+
+        memrd4:
+            for (uint32_t j = 0; j < chunk_size; j++) {
+#pragma HLS PIPELINE II = 1
+                outStream << buffer[j];
+            }
+        }
+    }
+    // printf("%s Done \n", __FUNCTION__);
+    outStreamSize << 0;
 }
 
 } // namespace compression

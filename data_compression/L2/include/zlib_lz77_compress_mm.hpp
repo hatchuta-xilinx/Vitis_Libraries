@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef _XFCOMPRESSION_LZ77_COMPRESS_KERNEL_HPP_
-#define _XFCOMPRESSION_LZ77_COMPRESS_KERNEL_HPP_
+#ifndef _XFCOMPRESSION_ZLIB_LZ77_COMPRESS_MM_HPP_
+#define _XFCOMPRESSION_ZLIB_LZ77_COMPRESS_MM_HPP_
 
 /**
  * @file lz77_compress_kernel.hpp
@@ -38,6 +38,35 @@
 #include <stdint.h>
 #include <assert.h>
 #include <ap_int.h>
+
+#define MIN_BLOCK_SIZE 128
+
+#define GMEM_DWIDTH 512
+#define GMEM_BURST_SIZE 16
+
+#define GET_DIFF_IF_BIG(x, y) (x > y) ? (x - y) : 0
+
+// LZ specific Defines
+#define BIT 8
+#define MIN_OFFSET 1
+//#define MIN_MATCH 4
+#define LZ_MAX_OFFSET_LIMIT 32768
+#define LZ_HASH_BIT 12
+#define LZ_DICT_SIZE (1 << LZ_HASH_BIT)
+#define MAX_MATCH_LEN 255
+#define OFFSET_WINDOW 32768
+#define MATCH_LEN 6
+//#define MIN_MATCH 4
+
+#define MATCH_LEVEL 6
+#define DICT_ELE_WIDTH (MATCH_LEN * BIT + 24)
+#define OUT_BYTES (4)
+
+#define MAX_MATCH 258
+#define MIN_MATCH 3
+#define LENGTH_CODES 29
+
+#define d_code(dist, dist_code) ((dist) < 256 ? dist_code[dist] : dist_code[256 + ((dist) >> 7)])
 
 extern "C" {
 /**

@@ -16,18 +16,11 @@
 
 #include "lz4_compress_stream.hpp"
 
-#define MIN_OFFSET 1
-#define MIN_MATCH 4
-#define LZ_MAX_OFFSET_LIMIT 65536
-#define OFFSET_WINDOW LZ_MAX_OFFSET_LIMIT
-#define LZ_HASH_BIT 12
-#define LZ_DICT_SIZE (1 << LZ_HASH_BIT)
-#define MAX_MATCH_LEN 255
-#define BIT 8
-#define MATCH_LEN 6
-#define MATCH_LEVEL 6
-
+const int kGMemBurstSize = 16;
 const int c_lz4MaxLiteralCount = MAX_LIT_COUNT;
+typedef ap_uint<32> compressd_dt;
+typedef ap_uint<64> lz4_compressd_dt;
+typedef ap_uint<8> streamDt;
 
 extern "C" {
 void xilLz4CompressStream(hls::stream<ap_axiu<8, 0, 0, 0> >& inaxistream,
@@ -40,14 +33,12 @@ void xilLz4CompressStream(hls::stream<ap_axiu<8, 0, 0, 0> >& inaxistream,
 #pragma HLS interface s_axilite port = inputSize bundle = control
 #pragma HLS interface s_axilite port = return bundle = control
 
-    hls::stream<xf::compression::compressd_dt> compressdStream("compressdStream");
-    hls::stream<xf::compression::compressd_dt> bestMatchStream("bestMatchStream");
-    hls::stream<xf::compression::compressd_dt> boosterStream("boosterStream");
-    hls::stream<uint8_t> litOut("litOut");
+    hls::stream<compressd_dt> compressdStream("compressdStream");
+    hls::stream<compressd_dt> bestMatchStream("bestMatchStream");
+    hls::stream<compressd_dt> boosterStream("boosterStream");
     hls::stream<uint32_t> compressedSize("compressedSize");
-    hls::stream<xf::compression::streamDt> inStream("inStream");
-    hls::stream<xf::compression::streamDt> outStream("outStream");
-    hls::stream<xf::compression::lz4_compressd_dt> lenOffsetOut("lenOffsetOut");
+    hls::stream<streamDt> inStream("inStream");
+    hls::stream<streamDt> outStream("outStream");
     hls::stream<bool> lz4OutEos("lz4OutEos");
 
 #pragma HLS STREAM variable = inStream depth = 2
@@ -55,16 +46,12 @@ void xilLz4CompressStream(hls::stream<ap_axiu<8, 0, 0, 0> >& inaxistream,
 #pragma HLS STREAM variable = compressdStream depth = 8
 #pragma HLS STREAM variable = bestMatchStream depth = 8
 #pragma HLS STREAM variable = boosterStream depth = 8
-#pragma HLS STREAM variable = litOut depth = xf::compression::c_lz4MaxLiteralCount
-#pragma HLS STREAM variable = lenOffsetOut depth = xf::compression::c_gmemBurstSize
 #pragma HLS STREAM variable = lz4OutEos depth = 8
 
 #pragma HLS RESOURCE variable = inStream core = FIFO_SRL
 #pragma HLS RESOURCE variable = outStream core = FIFO_SRL
 #pragma HLS RESOURCE variable = compressdStream core = FIFO_SRL
 #pragma HLS RESOURCE variable = boosterStream core = FIFO_SRL
-#pragma HLS RESOURCE variable = litOut core = FIFO_SRL
-#pragma HLS RESOURCE variable = lenOffsetOut core = FIFO_SRL
 #pragma HLS RESOURCE variable = lz4OutEos core = FIFO_SRL
 
 #pragma HLS dataflow
@@ -78,10 +65,8 @@ void xilLz4CompressStream(hls::stream<ap_axiu<8, 0, 0, 0> >& inaxistream,
     xf::compression::lzBestMatchFilter<MATCH_LEN, OFFSET_WINDOW>(compressdStream, bestMatchStream, inputSize,
                                                                  leftBytes);
     xf::compression::lzBooster<MAX_MATCH_LEN, OFFSET_WINDOW>(bestMatchStream, boosterStream, inputSize, leftBytes);
-    xf::compression::lz4Divide<MAX_LIT_COUNT, PARALLEL_BLOCK>(boosterStream, litOut, lenOffsetOut, inputSize, litLimit,
-                                                              0);
-    xf::compression::lz4Compress(litOut, lenOffsetOut, outStream, lz4OutEos, compressedSize, inputSize);
-
+    xf::compression::lz4Compress<MAX_LIT_COUNT, PARALLEL_BLOCK>(boosterStream, outStream, litLimit, inputSize,
+                                                                lz4OutEos, compressedSize, 0);
     xf::compression::kStreamWrite<8>(outaxistream, outStream, lz4OutEos, compressedSize);
 }
 }

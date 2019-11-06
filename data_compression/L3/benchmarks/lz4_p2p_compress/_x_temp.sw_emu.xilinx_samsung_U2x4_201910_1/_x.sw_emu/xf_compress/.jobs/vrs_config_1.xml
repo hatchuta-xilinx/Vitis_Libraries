@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<Runs Version="1" Minor="0">
+	<Run Id="xilLz4Compress" LaunchDir="/wrk/xhdhdnobkup1/hatchuta/git_repo/compression/samsung_p2p/compression_p2p/public_test/Vitis_Libraries/data_compression/L3/benchmarks/lz4_p2p_compress/_x_temp.sw_emu.xilinx_samsung_U2x4_201910_1/_x.sw_emu/xf_compress/xilLz4Compress" FlowId="Build_IP" FromStepId="vivado_hls" ToStepId="vivado_hls"/>
+</Runs>
+

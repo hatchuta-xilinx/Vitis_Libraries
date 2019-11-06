@@ -208,8 +208,6 @@ setup: | check_part
 
 COMPRESS_OUT_DIR:=./build_compress_ip
 
-compress_srcs+=../../include/hw/snappy_compress_core.hpp
-
 compress_script=./run_compress_hls.tcl 
 
 compress_ip_out=$(COMPRESS_OUT_DIR)/snappy_compress_test/snappy_compress_stream/impl/ip/component.xml

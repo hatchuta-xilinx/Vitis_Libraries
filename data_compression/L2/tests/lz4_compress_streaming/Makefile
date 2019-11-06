@@ -213,7 +213,7 @@ $(TEMP_DIR)/xf_compress_datamover.xo: $(COMP_DATAMOVER_KERNEL_SRCS) $(HLS_SRC_DI
 # xclbin Binary creation
 $(XCLBIN_FILE): $(TEMP_DIR)/xf_compress_streaming.xo $(TEMP_DIR)/xf_compress_datamover.xo
 	mkdir -p $(BUILD_DIR)
-	$(VPP) $(VPP_FLAGS) $(VPP_LINK_FLAGS) $(VPP_LINK_DIRS)/Compress/ -l \
+	$(VPP) $(VPP_FLAGS) $(VPP_LINK_FLAGS) $(VPP_LINK_DIRS)/Compress/ -l --profile_kernel data:all:all:all \
 	--config $(CUR_DIR)/compress.ini \
 	-o'$@' $(+)
 
@@ -284,7 +284,7 @@ cleanh:
 
 cleanall: cleanh cleank
 	rm -rf $(BUILD_DIR)
-	-$(RMDIR) _x_temp* $(CUR_DIR)/reports
+	-$(RMDIR) _x_temp* *.csv *.run_summary $(CUR_DIR)/reports
 	-$(RMDIR) $(XFLIB_DIR)/common/data/*.xe2xd* 
 
 clean: cleanh

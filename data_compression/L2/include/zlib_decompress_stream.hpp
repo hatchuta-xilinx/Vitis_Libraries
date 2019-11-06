@@ -15,11 +15,11 @@
  *
  */
 
-#ifndef _XFCOMPRESSION_ZLIB_DECOMPRESS_STREAM_KERNEL_HPP_
-#define _XFCOMPRESSION_ZLIB_DECOMPRESS_STREAM_KERNEL_HPP_
+#ifndef _XFCOMPRESSION_ZLIB_DECOMPRESS_STREAM_HPP_
+#define _XFCOMPRESSION_ZLIB_DECOMPRESS_STREAM_HPP_
 
 /**
- * @file zlib_decompress_stream_kernel.hpp
+ * @file zlib_decompress_stream.hpp
  * @brief Header for zlib decompression streaming kernel.
  *
  * This file is part of Vitis Data Compression Library.
@@ -30,25 +30,34 @@
 #include <assert.h>
 #include <ap_int.h>
 #include "hls_stream.h"
-#include "xil_inflate.h"
-#include "zlib_config.h"
+#include "huffman_decoder.hpp"
+#include "zlib_config.hpp"
 #include "lz_decompress.hpp"
-#include "axi_stream_utils.hpp"
+#include "stream_upsizer.hpp"
+#include "stream_downsizer.hpp"
+#include "ap_axi_sdata.h"
+
+#define MIN_OFFSET 1
+#define MIN_MATCH 4
+#define LZ_MAX_OFFSET_LIMIT 32768
+#define HISTORY_SIZE LZ_MAX_OFFSET_LIMIT
+#define LOW_OFFSET 10
+
+const int kGMemDWidth = 512;
+typedef ap_uint<kGMemDWidth> uintMemWidth_t;
 
 extern "C" {
 /**
- * @brief Zlib decompression host stream kernel top function.
+ * @brief Zlib decompression stream kernel top function.
  *
- * @param inaxistream 16-bit input host axi stream
- * @param outaxistream 8-bit output host axi stream
- * @param encodedsize compressed size output axi stream
  * @param input_size input size
+ * @param inaxistreamd input kernel axi stream
+ * @param outaxistreamd output kernel axi stream
  *
  */
-void xilZlibDecompressStream(hls::stream<xf::compression::hStream16b_t>& inaxistream,
-                             hls::stream<xf::compression::hStream8b_t>& outaxistream,
-                             hls::stream<xf::compression::hStream32b_t>& encodedsize,
-                             uint32_t input_size);
+void xilDecompressStream(uint32_t input_size,
+                         hls::stream<ap_axiu<kGMemDWidth, 0, 0, 0> >& inaxistreamd,
+                         hls::stream<ap_axiu<kGMemDWidth, 0, 0, 0> >& outaxistreamd,
+                         hls::stream<ap_axiu<32, 0, 0, 0> >& sizestreamd);
 }
-
 #endif // _XFCOMPRESSION_ZLIB_DECOMPRESS_STREAM_KERNEL_HPP_
