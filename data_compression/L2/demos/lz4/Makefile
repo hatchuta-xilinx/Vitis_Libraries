@@ -37,12 +37,12 @@ help::
 include ./utils.mk
 include ./config.mk
 
-TOOL_VERSION ?= 2019.2
+TOOL_VERSION ?= 2019.1
 
 #check environment setup
-ifndef XILINX_VITIS
-  XILINX_VITIS = /opt/xilinx/Vitis/$(TOOL_VERSION)
-  export XILINX_VITIS
+ifndef XILINX_SDX
+  XILINX_SDX = /opt/xilinx/SDx/$(TOOL_VERSION)
+  export XILINX_SDX
 endif
 ifndef XILINX_VIVADO
   XILINX_VIVADO = /opt/xilinx/Vivado/$(TOOL_VERSION)
@@ -59,27 +59,18 @@ ifeq (,$(wildcard $(XILINX_VIVADO)/bin/vivado))
 	@echo "Cannot locate Vivado installation. Please set XILINX_VIVADO variable." && false
 endif
 
-.PHONY: check_vpp
-check_vpp:
-ifeq (,$(wildcard $(XILINX_VITIS)/bin/v++))
-	@echo "Cannot locate Vitis installation. Please set XILINX_VITIS variable." && false
-endif
-
 .PHONY: check_xrt
 check_xrt:
 ifeq (,$(wildcard $(XILINX_XRT)/lib/libxilinxopencl.so))
 	@echo "Cannot locate XRT installation. Please set XILINX_XRT variable." && false
 endif
 
-export PATH := $(XILINX_VITIS)/bin:$(XILINX_XRT)/bin:$(PATH)
+export PATH := $(XILINX_SDX)/bin:$(XILINX_XRT)/bin:$(PATH)
 
 ifeq (,$(LD_LIBRARY_PATH))
   LD_LIBRARY_PATH := $(XILINX_XRT)/lib
 else
   LD_LIBRARY_PATH := $(XILINX_XRT)/lib:$(LD_LIBRARY_PATH)
-endif
-ifneq (,$(wildcard $(XILINX_VITIS)/bin/ldlibpath.sh))
-  export LD_LIBRARY_PATH := $(shell $(XILINX_VITIS)/bin/ldlibpath.sh $(XILINX_VITIS)/lib/lnx64.o):$(LD_LIBRARY_PATH)
 endif
 
 # sw_emu, hw_emu, hw
@@ -103,7 +94,7 @@ ifneq (,$(PLATFORM_REPO_PATHS))
   XPLATFORM := $(strip $(foreach p, $(XPLATFORMS), $(shell echo $(p) | awk '$$1 ~ /$(DEVICE_L)/')))
 endif
 ifeq (,$(XPLATFORM))
-  XPLATFORMS := $(wildcard $(XILINX_VITIS)/platforms/*/*.xpfm)
+  XPLATFORMS := $(wildcard $(XILINX_SDX)/platforms/*/*.xpfm)
   XPLATFORM := $(strip $(foreach p, $(XPLATFORMS), $(shell echo $(p) | awk '$$1 ~ /$(DEVICE_L)/')))
 endif
 ifeq (,$(XPLATFORM))
@@ -155,7 +146,7 @@ TB_DIR := $(XFLIB_DIR)/L2/tests/src/
 
 KSRC_DIR = $(XFLIB_DIR)/L2/src/
 
-VPP = $(XILINX_VITIS)/bin/v++
+VPP = $(XILINX_SDX)/bin/xocc
 
 # HLS src files
 HLS_SRC_DIR = $(XFLIB_DIR)/L1/include/hw
@@ -250,7 +241,7 @@ EXE_FILE = $(BUILD_DIR)/$(HOST_EXE)
 # ------------------------------------------------------------
 #                       host rules
 
-$(EXE_FILE): $(SRCS) | check_vpp check_xrt check_platform
+$(EXE_FILE): $(SRCS) | check_xrt check_platform
 	@echo -e "----\nCompiling host $(notdir $@)..."
 	mkdir -p $(BUILD_DIR)
 	$(CXX) -o $@ $^ $(CXXFLAGS) $(LDFLAGS)
@@ -263,7 +254,7 @@ $(EXE_FILE): $(SRCS) | check_vpp check_xrt check_platform
 
 all: host xclbin
 
-host: $(EXE_FILE) | check_vpp check_xrt check_platform
+host: $(EXE_FILE) | check_xrt check_platform
 
 xclbin: $(XCLBIN_FILE)
 

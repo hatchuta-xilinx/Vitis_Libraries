@@ -41,7 +41,7 @@ Note: Overall throughput can still be increased with multiple compute units.
 ## Software & Hardware
 
 ```
-  Software: Xilinx Vitis 2019.2
+  Software: Xilinx SDx 2019.1
   Hardware: xilinx_u200_xdma_201830_2 (Xilinx Alveo U200)
 ```
  
